@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VMC Training Confirmation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0d2137;
+    --blue:    #1a3a5c;
+    --green:   #1e5c3a;
+    --gold:    #c9a84c;
+    --light:   #f8f7f4;
+    --white:   #ffffff;
+    --border:  #e5e7eb;
+    --text:    #1a1a1a;
+    --muted:   #6b7280;
+    --amber:   #f59e0b;
+    --emerald: #10b981;
+  }
+
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: var(--light);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 60%, var(--green) 100%);
+    padding: 20px 24px 16px;
+    border-bottom: 3px solid var(--gold);
+    text-align: center;
+  }
+  .header-icon { font-size: 2rem; margin-bottom: 8px; }
+  .header-tag {
+    color: var(--gold); font-size: 0.65rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;
+  }
+  .header-title { color: #fff; font-size: 1.2rem; font-weight: 700; }
+  .header-sub   { color: #93b4d0; font-size: 0.75rem; margin-top: 4px; }
+
+  .page { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-header {
+    background: var(--navy); color: var(--gold);
+    padding: 10px 16px; font-size: 0.75rem;
+    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .card-body { padding: 16px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block; font-size: 0.7rem; font-weight: 700;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 5px;
+  }
+  .form-control {
+    width: 100%; border: 1.5px solid var(--border);
+    border-radius: 7px; padding: 9px 12px;
+    font-family: inherit; font-size: 0.85rem;
+    color: var(--text); background: #fafafa;
+    outline: none; transition: border-color 0.15s;
+  }
+  .form-control:focus { border-color: var(--blue); background: var(--white); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border: none; border-radius: 7px;
+    padding: 10px 20px; cursor: pointer;
+    font-family: inherit; font-size: 0.85rem; font-weight: 700;
+    transition: opacity 0.15s; width: 100%;
+  }
+  .btn:hover { opacity: 0.88; }
+  .btn-primary { background: var(--navy); color: var(--white); }
+  .btn-gold    { background: var(--gold); color: var(--navy); }
+  .btn-outline {
+    background: none; color: var(--navy);
+    border: 1.5px solid var(--navy);
+  }
+
+  .alert {
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 0.8rem; margin-bottom: 14px;
+    border-left: 4px solid;
+  }
+  .alert-info    { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
+  .alert-warning { background: #fffbeb; border-color: var(--gold); color: #78350f; }
+  .alert-success { background: #d1fae5; border-color: var(--emerald); color: #065f46; }
+  .alert-error   { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
+
+  .loading {
+    text-align: center; padding: 40px; color: var(--muted); font-size: 0.9rem;
+  }
+  .spinner {
+    display: inline-block; width: 28px; height: 28px;
+    border: 3px solid var(--border); border-top-color: var(--navy);
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .confirm-hero { text-align: center; padding: 24px 16px 16px; }
+  .confirm-icon  { font-size: 2.5rem; margin-bottom: 10px; }
+  .confirm-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .confirm-sub   { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
+
+  .cat-card {
+    border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .cat-card-header {
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #fff; font-weight: 700; font-size: 0.88rem;
+  }
+  .cat-card-body {
+    padding: 14px 16px;
+    background: #fafafa;
+    border-top: 1px solid var(--border);
+  }
+
+  .badge {
+    display: inline-block; border-radius: 4px;
+    padding: 2px 8px; font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .badge-done { background: #d1fae5; color: #065f46; }
+
+  .module-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 4px 0; font-size: 0.8rem; color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .module-item:last-child { border-bottom: none; }
+  .module-bullet {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--muted); flex-shrink: 0; margin-top: 6px;
+  }
+
+  .attest-box {
+    background: #fffbeb; border: 1px solid #fcd34d;
+    border-radius: 6px; padding: 10px 12px;
+    margin-bottom: 10px; font-size: 0.78rem; color: #78350f;
+    line-height: 1.5;
+  }
+
+  .done-screen {
+    text-align: center; padding: 40px 20px;
+  }
+  .done-icon  { font-size: 3rem; margin-bottom: 12px; }
+  .done-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--emerald); }
+  .done-sub   { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
+
+  /* Config screen */
+  .config-banner {
+    background: var(--navy); color: var(--white);
+    border-radius: 10px; padding: 20px;
+    text-align: center; margin-bottom: 20px;
+  }
+  .config-banner h2 { color: var(--gold); margin-bottom: 8px; }
+  .config-banner p  { font-size: 0.82rem; color: #93b4d0; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">✅</div>
+  <div class="header-tag">VMC · Staff Portal</div>
+  <div class="header-title">Training Confirmation</div>
+  <div class="header-sub">Homeless Veterans' Reintegration Program</div>
+</div>
+
+<!-- Config screen -->
+<div id="configScreen" style="display:none;">
+  <div class="page">
+    <div class="config-banner">
+      <h2>Setup Required</h2>
+      <p>This page needs to be connected to the VMC Google Sheet. Contact your program manager for the Apps Script URL.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">Connect to Google Sheet</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">Apps Script URL</label>
+          <input type="url" id="configUrl" class="form-control"
+            placeholder="https://script.google.com/macros/s/..." />
+        </div>
+        <button class="btn btn-primary" onclick="saveConfig()">Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="mainApp" style="display:none;">
+  <div class="page">
+
+    <!-- Loading -->
+    <div id="loadingState" class="loading">
+      <div class="spinner"></div><br/>Loading...
+    </div>
+
+    <!-- Step 1: Select who you are -->
+    <div id="step1" style="display:none;">
+      <div class="confirm-hero">
+        <div class="confirm-icon">👋</div>
+        <div class="confirm-title">Welcome</div>
+        <div class="confirm-sub">Select your program and name to view and confirm your training categories.</div>
+      </div>
+      <div class="card">
+        <div class="card-header">Who Are You?</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Program</label>
+            <select id="confProgram" class="form-control" onchange="onProgramChange()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <select id="confStaff" class="form-control"></select>
+          </div>
+          <button class="btn btn-primary" onclick="loadCategories()">View My Training</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Category confirmations -->
+    <div id="step2" style="display:none;">
+      <div class="confirm-hero">
+        <div class="confirm-icon">📋</div>
+        <div class="confirm-title" id="staffLabel"></div>
+        <div class="confirm-sub">
+          Confirm each category once you have completed all training within it.
+          Your confirmation is timestamped and recorded to your Google Sheet.
+        </div>
+      </div>
+      <div id="catList"></div>
+      <button class="btn btn-outline" onclick="goBack()" style="margin-top:4px;">← Back</button>
+    </div>
+
+    <!-- Done screen (all confirmed) -->
+    <div id="doneScreen" style="display:none;">
+      <div class="done-screen">
+        <div class="done-icon">🎖️</div>
+        <div class="done-title">All Categories Confirmed!</div>
+        <div class="done-sub">
+          You have confirmed all training categories. Your records have been saved.<br><br>
+          Thank you for completing your HVRP staff training.
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="goBack()" style="margin-top:16px;">← Back to Start</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const CONFIG_KEY = "vmc_training_script_url";
+let SCRIPT_URL = localStorage.getItem(CONFIG_KEY) || "";
+
+const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c"];
+
+let state = { programs: [], staff: [], categories: [], confirmations: [] };
+let currentProgramId = "";
+let currentStaffId   = "";
+
+window.addEventListener("load", () => {
+  if (!SCRIPT_URL) {
+    document.getElementById("configScreen").style.display = "block";
+  } else {
+    document.getElementById("mainApp").style.display = "block";
+    loadData();
+  }
+});
+
+function saveConfig() {
+  const url = document.getElementById("configUrl").value.trim();
+  if (!url.startsWith("https://script.google.com")) {
+    alert("Please enter a valid Apps Script URL.");
+    return;
+  }
+  localStorage.setItem(CONFIG_KEY, url);
+  SCRIPT_URL = url;
+  document.getElementById("configScreen").style.display = "none";
+  document.getElementById("mainApp").style.display = "block";
+  loadData();
+}
+
+async function api(action, body = null) {
+  if (body) {
+    const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action, ...body }) });
+    return res.json();
+  } else {
+    const res = await fetch(`${SCRIPT_URL}?action=${action}`);
+    return res.json();
+  }
+}
+
+async function loadData() {
+  show("loadingState");
+  try {
+    const data = await api("getBootstrap");
+    if (data.success) {
+      state = data;
+      initUI();
+    } else {
+      document.getElementById("loadingState").innerHTML =
+        `<div class="alert alert-error">Could not load data: ${data.error}</div>`;
+    }
+  } catch (e) {
+    document.getElementById("loadingState").innerHTML =
+      `<div class="alert alert-error">Connection error. Check your setup.</div>`;
+  }
+}
+
+function initUI() {
+  const activePrograms = state.programs.filter(p => p.Active === "Yes");
+  const sel = document.getElementById("confProgram");
+  sel.innerHTML = activePrograms.map(p =>
+    `<option value="${p.ProgramID}">${p.ProgramName}</option>`
+  ).join("");
+  onProgramChange();
+  show("step1");
+}
+
+function onProgramChange() {
+  const programId = document.getElementById("confProgram").value;
+  const staff = state.staff.filter(s => s.ProgramID === programId && s.Active === "Yes");
+  const sel = document.getElementById("confStaff");
+  sel.innerHTML = staff.map(s =>
+    `<option value="${s.StaffID}">${s.FullName}</option>`
+  ).join("");
+}
+
+function loadCategories() {
+  currentProgramId = document.getElementById("confProgram").value;
+  currentStaffId   = document.getElementById("confStaff").value;
+  const staffObj   = state.staff.find(s => s.StaffID === currentStaffId);
+  if (!staffObj) return;
+
+  document.getElementById("staffLabel").textContent = staffObj.FullName + " · " + staffObj.Role;
+  renderCategories();
+  show("step2");
+}
+
+function renderCategories() {
+  const cats = state.categories
+    .filter(c => {
+      const prog = state.programs.find(p => p.ProgramID === currentProgramId);
+      return prog && c.ProgramTypeID === prog.ProgramTypeID;
+    })
+    .sort((a, b) => a.CategoryOrder - b.CategoryOrder);
+
+  const allDone = cats.every(c => hasConfirmed(currentStaffId, c.CategoryID));
+  if (allDone && cats.length > 0) {
+    show("doneScreen");
+    return;
+  }
+
+  document.getElementById("catList").innerHTML = cats.map((c, i) => {
+    const done = hasConfirmed(currentStaffId, c.CategoryID);
+    const modules = (c.Modules || "").split("|").map(m => m.trim()).filter(Boolean);
+    const confirmedAt = state.confirmations.find(
+      cf => cf.StaffID === currentStaffId && cf.CategoryID === c.CategoryID
+    )?.ConfirmedAt;
+
+    return `
+      <div class="cat-card">
+        <div class="cat-card-header" style="background:${CAT_COLORS[i % CAT_COLORS.length]}">
+          <span>${c.CategoryName}</span>
+          ${done ? '<span class="badge badge-done">Confirmed ✓</span>' : ''}
+        </div>
+        <div class="cat-card-body">
+          <div style="margin-bottom:10px;">
+            ${modules.map(m => `
+              <div class="module-item">
+                <div class="module-bullet"></div>
+                <span>${m}</span>
+              </div>`).join("")}
+          </div>
+          ${done
+            ? `<p style="color:#065f46;font-size:0.78rem;font-weight:700;">
+                ✓ Confirmed on ${fmtDate(confirmedAt)}
+               </p>`
+            : `<div class="attest-box">
+                By confirming, you attest that you have received and understood
+                all training covered in this category.
+               </div>
+               <button class="btn btn-gold"
+                 onclick="confirmCategory('${c.CategoryID}','${c.CategoryName}',${i})">
+                 Confirm Category Completion
+               </button>`
+          }
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function confirmCategory(categoryId, categoryName, idx) {
+  const staffObj = state.staff.find(s => s.StaffID === currentStaffId);
+  if (!confirm(`Confirm you have completed training in:\n"${categoryName}"?\n\nThis will be recorded with a timestamp.`)) return;
+
+  const res = await api("confirmCategory", {
+    staffId:      currentStaffId,
+    staffName:    staffObj.FullName,
+    programId:    currentProgramId,
+    categoryId,
+    categoryName
+  });
+
+  if (res.success) {
+    const data = await api("getBootstrap");
+    if (data.success) { state = data; }
+    renderCategories();
+  } else {
+    alert("Error saving: " + res.error);
+  }
+}
+
+function goBack() {
+  show("step1");
+}
+
+function hasConfirmed(staffId, categoryId) {
+  return state.confirmations.some(c => c.StaffID === staffId && c.CategoryID === categoryId);
+}
+
+function fmtDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d) ? iso : d.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
+}
+
+function show(id) {
+  ["loadingState","step1","step2","doneScreen"].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = s === id ? "block" : "none";
+  });
+}
+</script>
+</body>
+</html>
