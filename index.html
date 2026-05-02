@@ -44,7 +44,6 @@ textarea.form-control{resize:vertical;min-height:80px}
 .btn-gold{background:var(--gold);color:var(--navy)}
 .btn-green{background:var(--green);color:var(--white)}
 .btn-outline{background:none;color:var(--navy);border:1.5px solid var(--navy)}
-.btn-red{background:var(--red);color:var(--white)}
 .btn-block{width:100%}
 .btn-sm{padding:5px 12px;font-size:.75rem}
 .badge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
@@ -52,8 +51,7 @@ textarea.form-control{resize:vertical;min-height:80px}
 .badge-partial{background:#fef3c7;color:#92400e}
 .badge-todo{background:#f3f4f6;color:var(--muted)}
 .badge-save{background:#ede9fe;color:#5b21b6}
-.badge-renewal{background:#fce7f3;color:#9d174d}
-.progress-wrap{background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;margin-top:6px}
+.progress-wrap{background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;margin-top:4px}
 .progress-bar{height:100%;border-radius:99px;background:var(--navy);transition:width .4s ease}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px}
 .stat-box{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
@@ -76,11 +74,17 @@ tr:last-child td{border-bottom:none}
 .check-item{display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer;border-bottom:1px solid #f9fafb}
 .check-item:last-child{border-bottom:none}
 .check-item input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--navy)}
-.staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;margin-bottom:14px}
-.staff-card{border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;background:var(--white)}
-.staff-card:hover{border-color:var(--blue)}
-.staff-card.selected{border-color:var(--navy);background:#eef2ff}
-.save-flag{background:#ede9fe;border:1px solid #a78bfa;border-radius:6px;padding:8px 12px;font-size:.78rem;color:#5b21b6;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+/* Category accordion */
+.cat-section{margin-bottom:12px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.cat-section-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--white);cursor:pointer}
+.cat-section-header:hover{background:#f9fafb}
+.cat-color{width:4px;height:24px;border-radius:2px;flex-shrink:0}
+.cat-section-body{padding:12px 16px;background:#fafafa;border-top:1px solid var(--border)}
+.module-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f3f4f6;gap:8px;flex-wrap:wrap}
+.module-row:last-child{border-bottom:none}
+.module-info{flex:1;min-width:160px}
+.module-name{font-size:.82rem;font-weight:600;color:#111827}
+.module-meta{font-size:.7rem;color:var(--muted);margin-top:2px}
 /* PIN screen */
 .pin-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,var(--green) 100%)}
 .pin-box{background:var(--white);border-radius:16px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -114,7 +118,7 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- Config screen (first time setup) -->
+<!-- Config screen -->
 <div id="configScreen" style="display:none;padding:24px;max-width:560px;margin:0 auto">
   <div style="background:var(--navy);color:var(--white);border-radius:10px;padding:20px;text-align:center;margin-bottom:20px">
     <div style="font-size:2rem;margin-bottom:8px">⚙️</div>
@@ -152,18 +156,16 @@ tr:last-child td{border-bottom:none}
     <button class="nav-btn active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
     <button class="nav-btn" onclick="showTab('logSession',this)">📋 Log Training</button>
     <button class="nav-btn" onclick="showTab('history',this)">📁 History</button>
-    <button class="nav-btn" onclick="showTab('manage',this)" id="manageTab">⚙️ Manage</button>
+    <button class="nav-btn" onclick="showTab('manage',this)">⚙️ Manage</button>
   </nav>
 
   <div id="loadingState" class="loading"><div class="spinner"></div><br/>Loading data...</div>
 
   <!-- DASHBOARD -->
   <div id="page-dashboard" class="page">
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end">
-      <div style="flex:1;min-width:180px">
-        <label class="form-label">Program</label>
-        <select id="dashProgram" class="form-control" onchange="renderDashboard()"></select>
-      </div>
+    <div style="margin-bottom:16px">
+      <label class="form-label">Program</label>
+      <select id="dashProgram" class="form-control" onchange="renderDashboard()"></select>
     </div>
     <div id="dashStats" class="stat-grid"></div>
     <div id="saveAlert"></div>
@@ -172,14 +174,14 @@ tr:last-child td{border-bottom:none}
       <div class="card-body" id="dashStaffProgress"></div>
     </div>
     <div class="card">
-      <div class="card-header">Category Coverage</div>
+      <div class="card-header">Category & Module Progress</div>
       <div class="card-body" id="dashCatCoverage"></div>
     </div>
   </div>
 
   <!-- LOG SESSION -->
   <div id="page-logSession" class="page">
-    <div class="alert alert-info">Log a training session you delivered. Select all staff who attended.</div>
+    <div class="alert alert-info">Select the program, category, then the specific module delivered. Select all staff who attended.</div>
     <div class="card">
       <div class="card-header">Session Details</div>
       <div class="card-body">
@@ -189,10 +191,19 @@ tr:last-child td{border-bottom:none}
         </div>
         <div class="form-group">
           <label class="form-label">Training Category</label>
-          <select id="logCategory" class="form-control" onchange="renderModuleRef()"></select>
+          <select id="logCategory" class="form-control" onchange="onLogCategoryChange()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Module</label>
+          <select id="logModule" class="form-control" onchange="onLogModuleChange()"></select>
+        </div>
+        <div id="moduleInfo" style="display:none;margin-bottom:14px">
+          <div style="background:#f0f4ff;border:1px solid #c7d7f8;border-radius:7px;padding:10px 12px;font-size:.78rem;color:#1e3a8a">
+            <span id="moduleHours"></span> · <span id="moduleSource"></span>
+          </div>
         </div>
         <div id="saveWarning" style="display:none" class="alert alert-save">
-          ⚠️ S.A.V.E. is included in this category and is a <strong>VA Required Annual Training</strong>. Make sure to document completion separately for annual renewal tracking.
+          ⚠️ This module includes S.A.V.E. Suicide Prevention Training which is a VA Required Annual Training.
         </div>
         <div class="form-group">
           <label class="form-label">Session Date</label>
@@ -228,15 +239,11 @@ tr:last-child td{border-bottom:none}
         <button class="btn btn-primary btn-block" onclick="submitSession()">Log Training Session</button>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header">Modules in Selected Category</div>
-      <div class="card-body" id="logModuleRef"><span style="color:var(--muted);font-size:.82rem">Select a category above.</span></div>
-    </div>
   </div>
 
   <!-- HISTORY -->
   <div id="page-history" class="page">
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:16px">
       <div>
         <label class="form-label">Program</label>
         <select id="histProgram" class="form-control" onchange="renderHistory()">
@@ -268,11 +275,6 @@ tr:last-child td{border-bottom:none}
 
   <!-- MANAGE -->
   <div id="page-manage" class="page">
-    <div id="adminOnlyMsg" style="display:none" class="alert alert-warning">
-      Some features on this page are only available to Admin users.
-    </div>
-
-    <!-- Add Program (admin only) -->
     <div id="addProgramCard" class="card">
       <div class="card-header">Add New Program</div>
       <div class="card-body">
@@ -297,7 +299,6 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- Add Staff -->
     <div class="card">
       <div class="card-header">Add Staff Member</div>
       <div class="card-body">
@@ -330,7 +331,6 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- Roster -->
     <div class="card">
       <div class="card-header">Staff Roster</div>
       <div class="card-body">
@@ -344,7 +344,6 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
 
-    <!-- Settings -->
     <div class="card">
       <div class="card-header">Settings</div>
       <div class="card-body">
@@ -357,89 +356,70 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
   </div>
-
-</div><!-- /mainApp -->
+</div>
 
 <script>
 const CONFIG_KEY = "vmc_training_script_url";
-const PIN_KEY    = "vmc_training_pin";
 let SCRIPT_URL   = localStorage.getItem(CONFIG_KEY) || "";
 let currentPin   = "";
 let userRole     = "";
 let userSites    = [];
-
 const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c","#5c1a2e"];
+let state = { programs:[], staff:[], categories:[], modules:[], programTypes:[], sessions:[], confirmations:[], role:"", sites:[] };
 
-let state = { programs:[], staff:[], categories:[], programTypes:[], sessions:[], confirmations:[], role:"", sites:[] };
-
-// ── Boot ──────────────────────────────────────────────────────
 window.addEventListener("load", () => {
-  if (!SCRIPT_URL) {
-    document.getElementById("configScreen").style.display = "block";
-  } else {
-    document.getElementById("pinScreen").style.display = "flex";
-  }
+  if (!SCRIPT_URL) { document.getElementById("configScreen").style.display="block"; }
+  else { document.getElementById("pinScreen").style.display="flex"; }
 });
 
 function saveConfig() {
   const url = document.getElementById("configUrl").value.trim();
   if (!url.startsWith("https://script.google.com")) { alert("Please enter a valid Apps Script URL."); return; }
-  localStorage.setItem(CONFIG_KEY, url);
-  SCRIPT_URL = url;
-  document.getElementById("configScreen").style.display = "none";
-  document.getElementById("pinScreen").style.display = "flex";
+  localStorage.setItem(CONFIG_KEY, url); SCRIPT_URL = url;
+  document.getElementById("configScreen").style.display="none";
+  document.getElementById("pinScreen").style.display="flex";
 }
 
 async function submitPin() {
   const pin = document.getElementById("pinInput").value.trim();
   if (!pin) return;
-  document.getElementById("pinError").textContent = "";
-
+  document.getElementById("pinError").textContent="";
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=validatePin&pin=${encodeURIComponent(pin)}`);
+    const res  = await fetch(`${SCRIPT_URL}?action=validatePin&pin=${encodeURIComponent(pin)}`);
     const data = await res.json();
     if (data.success) {
-      currentPin = pin;
-      userRole   = data.role;
-      userSites  = data.sites;
-      document.getElementById("pinScreen").style.display = "none";
-      document.getElementById("mainApp").style.display   = "block";
-      document.getElementById("roleBadge").textContent   = userRole === "Admin" ? "Admin" : "Program Manager";
+      currentPin=pin; userRole=data.role; userSites=data.sites;
+      document.getElementById("pinScreen").style.display="none";
+      document.getElementById("mainApp").style.display="block";
+      document.getElementById("roleBadge").textContent=userRole==="Admin"?"Admin":"Program Manager";
       loadData();
     } else {
-      document.getElementById("pinError").textContent = "Incorrect PIN. Please try again.";
-      document.getElementById("pinInput").value = "";
+      document.getElementById("pinError").textContent="Incorrect PIN. Please try again.";
+      document.getElementById("pinInput").value="";
     }
-  } catch(e) {
-    document.getElementById("pinError").textContent = "Connection error. Check your setup.";
-  }
+  } catch(e) { document.getElementById("pinError").textContent="Connection error. Check your setup."; }
 }
 
 function logout() {
-  currentPin = ""; userRole = ""; userSites = [];
-  document.getElementById("pinInput").value = "";
-  document.getElementById("mainApp").style.display = "none";
-  document.getElementById("pinScreen").style.display = "flex";
+  currentPin=""; userRole=""; userSites=[];
+  document.getElementById("pinInput").value="";
+  document.getElementById("mainApp").style.display="none";
+  document.getElementById("pinScreen").style.display="flex";
 }
 
 function updateScriptUrl() {
   const url = document.getElementById("newScriptUrl").value.trim();
   const msg = document.getElementById("updateUrlMsg");
-  if (!url.startsWith("https://script.google.com")) {
-    msg.innerHTML = '<div class="alert alert-error">Please enter a valid Apps Script URL.</div>';
-    return;
-  }
-  localStorage.setItem(CONFIG_KEY, url);
-  SCRIPT_URL = url;
-  msg.innerHTML = '<div class="alert alert-success">URL updated! Reloading data...</div>';
-  document.getElementById("newScriptUrl").value = "";
-  setTimeout(() => { loadData(); }, 1200);
+  if (!url.startsWith("https://script.google.com")) { msg.innerHTML='<div class="alert alert-error">Please enter a valid Apps Script URL.</div>'; return; }
+  localStorage.setItem(CONFIG_KEY, url); SCRIPT_URL=url;
+  msg.innerHTML='<div class="alert alert-success">URL updated! Reloading...</div>';
+  document.getElementById("newScriptUrl").value="";
+  setTimeout(()=>{ loadData(); },1200);
 }
 
-// ── API ───────────────────────────────────────────────────────
 async function api(action, body=null) {
   if (body) {
-    const r = await fetch(SCRIPT_URL, { method:"POST", body: JSON.stringify({action, pin:currentPin, ...body}) });
+    const r = await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify({action,pin:currentPin,...body})});
     return r.json();
   } else {
     const r = await fetch(`${SCRIPT_URL}?action=${action}&pin=${encodeURIComponent(currentPin)}`);
@@ -448,305 +428,302 @@ async function api(action, body=null) {
 }
 
 async function loadData() {
-  document.getElementById("loadingState").style.display = "block";
+  document.getElementById("loadingState").style.display="block";
   try {
     const data = await api("getBootstrap");
-    if (data.success) {
-      state = data;
-      initUI();
-    } else {
-      document.getElementById("loadingState").innerHTML = `<div class="alert alert-error">${data.error}</div>`;
-    }
-  } catch(e) {
-    document.getElementById("loadingState").innerHTML = `<div class="alert alert-error">Connection error.</div>`;
-  }
-  document.getElementById("loadingState").style.display = "none";
+    if (data.success) { state=data; initUI(); }
+    else { document.getElementById("loadingState").innerHTML=`<div class="alert alert-error">${data.error}</div>`; }
+  } catch(e) { document.getElementById("loadingState").innerHTML=`<div class="alert alert-error">Connection error.</div>`; }
+  document.getElementById("loadingState").style.display="none";
 }
 
-// ── UI Init ───────────────────────────────────────────────────
 function initUI() {
-  const progs = state.programs.filter(p => p.Active === "Yes");
+  const progs = state.programs.filter(p=>p.Active==="Yes");
+  populateSelect("dashProgram",      progs,"ProgramID","ProgramName");
+  populateSelect("logProgram",       progs,"ProgramID","ProgramName");
+  populateSelect("mgmtStaffProgram", progs,"ProgramID","ProgramName");
+  populateSelect("mgmtProgType", state.programTypes.filter(t=>t.ProgramTypeID!=="HQ"),"ProgramTypeID","ProgramTypeName");
+  populateSelect("histProgram",  progs,"ProgramID","ProgramName",true);
 
-  populateSelect("dashProgram",      progs, "ProgramID","ProgramName");
-  populateSelect("logProgram",       progs, "ProgramID","ProgramName");
-  populateSelect("mgmtStaffProgram", progs, "ProgramID","ProgramName");
-  populateSelect("mgmtProgType", state.programTypes.filter(t => t.ProgramTypeID !== "HQ"), "ProgramTypeID","ProgramTypeName");
-
-  // History filters
-  populateSelect("histProgram", progs, "ProgramID","ProgramName", true);
-  populateSelect("histCat",
-    [...new Map(state.categories.map(c=>[c.CategoryName,c])).values()],
-    "CategoryName","CategoryName", true);
+  // History category filter -- unique category names
+  const catNames = [...new Set(state.categories.map(c=>c.CategoryName))];
+  const histCat  = document.getElementById("histCat");
+  histCat.innerHTML = '<option value="">All Categories</option>';
+  catNames.forEach(n=>{ const o=document.createElement("option"); o.value=n; o.textContent=n; histCat.appendChild(o); });
 
   document.getElementById("logDate").value = new Date().toISOString().split("T")[0];
-
-  // Admin-only controls
-  if (userRole !== "Admin") {
-    document.getElementById("addProgramCard").style.display = "none";
-  }
+  if (userRole!=="Admin") document.getElementById("addProgramCard").style.display="none";
 
   onLogProgramChange();
   renderDashboard();
   renderManage();
-  populateRosterPrograms();
 
   document.getElementById("page-dashboard").classList.add("active");
-
-  // Header stats
-  const totalStaff = state.staff.filter(s => s.Active === "Yes").length;
-  const totalProgs = progs.length;
   document.getElementById("headerMeta").innerHTML = `
-    <div class="header-meta-item"><div class="val">${totalProgs}</div><div class="lbl">Programs</div></div>
-    <div class="header-meta-item"><div class="val">${totalStaff}</div><div class="lbl">Staff</div></div>
-    <div class="header-meta-item"><div class="val">${userRole === "Admin" ? "All Sites" : totalProgs + " Site" + (totalProgs!==1?"s":"")}</div><div class="lbl">Access</div></div>
+    <div class="header-meta-item"><div class="val">${progs.length}</div><div class="lbl">Programs</div></div>
+    <div class="header-meta-item"><div class="val">${state.staff.filter(s=>s.Active==="Yes").length}</div><div class="lbl">Staff</div></div>
+    <div class="header-meta-item"><div class="val">${state.modules.length}</div><div class="lbl">Modules</div></div>
   `;
 }
 
 function showTab(name, btn) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
   document.getElementById("page-"+name).classList.add("active");
-  if (btn) btn.classList.add("active");
-  if (name==="history") renderHistory();
-  if (name==="manage")  renderManage();
-  if (name==="dashboard") renderDashboard();
+  if(btn) btn.classList.add("active");
+  if(name==="history") renderHistory();
+  if(name==="manage")  renderManage();
+  if(name==="dashboard") renderDashboard();
 }
 
-// ── Helpers ───────────────────────────────────────────────────
 function populateSelect(id, items, valKey, labelKey, addAll=false) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.innerHTML = "";
-  if (addAll) el.innerHTML = `<option value="">All</option>`;
-  items.forEach(item => {
-    const o = document.createElement("option");
-    o.value = item[valKey]; o.textContent = item[labelKey];
-    el.appendChild(o);
-  });
+  const el=document.getElementById(id); if(!el) return;
+  el.innerHTML="";
+  if(addAll) el.innerHTML='<option value="">All</option>';
+  items.forEach(item=>{ const o=document.createElement("option"); o.value=item[valKey]; o.textContent=item[labelKey]; el.appendChild(o); });
 }
 
 function activeStaff(programId) {
-  return state.staff.filter(s => (!programId || s.ProgramID===programId) && s.Active==="Yes");
+  return state.staff.filter(s=>(!programId||s.ProgramID===programId)&&s.Active==="Yes");
 }
 
 function programCategories(programId) {
-  const prog = state.programs.find(p => p.ProgramID===programId);
-  if (!prog) return [];
-  return state.categories.filter(c => c.ProgramTypeID===prog.ProgramTypeID).sort((a,b)=>a.CategoryOrder-b.CategoryOrder);
+  const prog=state.programs.find(p=>p.ProgramID===programId);
+  if(!prog) return [];
+  return state.categories.filter(c=>c.ProgramTypeID===prog.ProgramTypeID).sort((a,b)=>a.CategoryOrder-b.CategoryOrder);
+}
+
+function categoryModules(categoryId) {
+  return state.modules.filter(m=>m.CategoryID===categoryId).sort((a,b)=>a.ModuleOrder-b.ModuleOrder);
+}
+
+function moduleSessionCount(programId, moduleId, staffId=null) {
+  return state.sessions.filter(s=>{
+    const match = s.ProgramID===programId && s.ModuleID===moduleId;
+    if(!staffId) return match;
+    return match && s.AttendeeIDs && s.AttendeeIDs.includes(staffId);
+  }).length;
+}
+
+function staffModulesDelivered(staffId, programId, categoryId) {
+  const mods = categoryModules(categoryId);
+  return mods.filter(m=>moduleSessionCount(programId,m.ModuleID,staffId)>0).length;
 }
 
 function hasConfirmed(staffId, categoryId, year=null) {
-  return state.confirmations.some(c => {
-    const match = c.StaffID===staffId && c.CategoryID===categoryId;
-    if (!year) return match;
-    return match && c.RenewalYear===String(year);
+  return state.confirmations.some(c=>{
+    const match=c.StaffID===staffId&&c.CategoryID===categoryId;
+    if(!year) return match;
+    return match&&String(c.RenewalYear)===String(year);
   });
 }
 
-function staffConfirmPct(staffId, programId) {
-  const cats = programCategories(programId);
-  if (!cats.length) return 0;
-  const thisYear = new Date().getFullYear();
-  const done = cats.filter(c => {
-    if (c.AnnualRenewal==="Yes") return hasConfirmed(staffId, c.CategoryID, thisYear);
-    return hasConfirmed(staffId, c.CategoryID);
-  }).length;
-  return Math.round((done/cats.length)*100);
+function staffOverallPct(staffId, programId) {
+  const totalMods = programCategories(programId).reduce((sum,cat)=>sum+categoryModules(cat.CategoryID).length,0);
+  if(!totalMods) return 0;
+  const delivered = programCategories(programId).reduce((sum,cat)=>sum+staffModulesDelivered(staffId,programId,cat.CategoryID),0);
+  return Math.round((delivered/totalMods)*100);
 }
 
 function fmtDate(iso) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return isNaN(d) ? iso : d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+  if(!iso) return "";
+  const d=new Date(iso);
+  return isNaN(d)?iso:d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
 }
-
-function getProgramName(id) {
-  return state.programs.find(p=>p.ProgramID===id)?.ProgramName || id;
-}
-function getCatName(id) {
-  return state.categories.find(c=>c.CategoryID===id)?.CategoryName || id;
-}
+function getProgramName(id){ return state.programs.find(p=>p.ProgramID===id)?.ProgramName||id; }
+function getCatName(id){ return state.categories.find(c=>c.CategoryID===id)?.CategoryName||id; }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 function renderDashboard() {
-  const programId = document.getElementById("dashProgram")?.value;
-  if (!programId) return;
-
-  const staff    = activeStaff(programId);
-  const cats     = programCategories(programId);
-  const sessions = state.sessions.filter(s => s.ProgramID===programId);
-  const confs    = state.confirmations.filter(c => c.ProgramID===programId);
-  const thisYear = new Date().getFullYear();
-  const fullyTrained = staff.filter(s => staffConfirmPct(s.StaffID, programId)===100).length;
+  const programId=document.getElementById("dashProgram")?.value; if(!programId) return;
+  const staff    =activeStaff(programId);
+  const cats     =programCategories(programId);
+  const sessions =state.sessions.filter(s=>s.ProgramID===programId);
+  const confs    =state.confirmations.filter(c=>c.ProgramID===programId);
+  const thisYear =new Date().getFullYear();
+  const totalMods=cats.reduce((s,c)=>s+categoryModules(c.CategoryID).length,0);
 
   // S.A.V.E. alert
-  const saveCat = cats.find(c => c.AnnualRenewal==="Yes");
-  const saveEl  = document.getElementById("saveAlert");
-  if (saveCat) {
-    const needRenewal = staff.filter(s => !hasConfirmed(s.StaffID, saveCat.CategoryID, thisYear));
-    if (needRenewal.length > 0) {
-      saveEl.innerHTML = `<div class="alert alert-save">⚠️ <strong>S.A.V.E. Annual Renewal Due (${thisYear}):</strong> ${needRenewal.map(s=>s.FullName).join(", ")} have not confirmed ${saveCat.CategoryName} for ${thisYear}.</div>`;
-    } else {
-      saveEl.innerHTML = `<div class="alert alert-success">✓ All staff have completed S.A.V.E. renewal for ${thisYear}.</div>`;
-    }
-  } else { saveEl.innerHTML = ""; }
+  const saveCat=cats.find(c=>c.AnnualRenewal==="Yes");
+  const saveEl =document.getElementById("saveAlert");
+  if(saveCat) {
+    const needRenewal=staff.filter(s=>!hasConfirmed(s.StaffID,saveCat.CategoryID,thisYear));
+    saveEl.innerHTML = needRenewal.length>0
+      ? `<div class="alert alert-save">⚠️ <strong>S.A.V.E. Annual Renewal Due (${thisYear}):</strong> ${needRenewal.map(s=>s.FullName).join(", ")} have not confirmed for ${thisYear}.</div>`
+      : `<div class="alert alert-success">✓ All staff have completed S.A.V.E. renewal for ${thisYear}.</div>`;
+  } else { saveEl.innerHTML=""; }
 
-  document.getElementById("dashStats").innerHTML = `
+  const fullyTrained=staff.filter(s=>staffOverallPct(s.StaffID,programId)===100).length;
+  document.getElementById("dashStats").innerHTML=`
     <div class="stat-box"><div class="stat-val">${staff.length}</div><div class="stat-lbl">Staff</div></div>
     <div class="stat-box"><div class="stat-val">${cats.length}</div><div class="stat-lbl">Categories</div></div>
+    <div class="stat-box"><div class="stat-val">${totalMods}</div><div class="stat-lbl">Modules</div></div>
     <div class="stat-box"><div class="stat-val">${sessions.length}</div><div class="stat-lbl">Sessions</div></div>
-    <div class="stat-box"><div class="stat-val">${confs.length}</div><div class="stat-lbl">Confirmations</div></div>
     <div class="stat-box"><div class="stat-val" style="color:var(--emerald)">${fullyTrained}</div><div class="stat-lbl">Fully Trained</div></div>
   `;
 
   // Staff progress
-  if (!staff.length) {
-    document.getElementById("dashStaffProgress").innerHTML = '<p style="color:var(--muted);font-size:.82rem">No staff added yet. Go to Manage to add staff.</p>';
-  } else {
-    document.getElementById("dashStaffProgress").innerHTML = staff.map(s => {
-      const pct = staffConfirmPct(s.StaffID, programId);
-      const color = pct===100 ? "var(--emerald)" : pct>0 ? "var(--navy)" : "var(--border)";
-      return `
-        <div style="margin-bottom:16px">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;flex-wrap:wrap;gap:4px">
-            <div>
-              <span style="font-weight:700;font-size:.85rem">${s.FullName}</span>
-              <span style="color:var(--muted);font-size:.72rem;margin-left:6px">${s.Role}</span>
+  document.getElementById("dashStaffProgress").innerHTML = !staff.length
+    ? '<p style="color:var(--muted);font-size:.82rem">No staff added yet.</p>'
+    : staff.map(s=>{
+        const pct=staffOverallPct(s.StaffID,programId);
+        const color=pct===100?"var(--emerald)":pct>0?"var(--navy)":"var(--border)";
+        const catBadges=cats.map(c=>{
+          const mods=categoryModules(c.CategoryID);
+          const delivered=staffModulesDelivered(s.StaffID,programId,c.CategoryID);
+          const confirmed=hasConfirmed(s.StaffID,c.CategoryID,c.AnnualRenewal==="Yes"?thisYear:null);
+          const cls=confirmed?"badge-done":delivered>0?"badge-partial":"badge-todo";
+          return `<span class="badge ${cls}" title="${c.CategoryName}: ${delivered}/${mods.length} modules">${c.CategoryName.split(" ")[0]} ${delivered}/${mods.length}</span>`;
+        }).join("");
+        return `
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;flex-wrap:wrap;gap:4px">
+              <div>
+                <span style="font-weight:700;font-size:.85rem">${s.FullName}</span>
+                <span style="color:var(--muted);font-size:.72rem;margin-left:6px">${s.Role}</span>
+              </div>
+              <span style="font-weight:700;font-size:.8rem;color:${color}">${pct}% modules delivered</span>
             </div>
-            <span style="font-weight:700;font-size:.8rem;color:${color}">${pct}%</span>
+            <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${color}"></div></div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">${catBadges}</div>
+          </div>`;
+      }).join("");
+
+  // Category & module breakdown
+  document.getElementById("dashCatCoverage").innerHTML = cats.map((c,i)=>{
+    const mods=categoryModules(c.CategoryID);
+    const isAnnual=c.AnnualRenewal==="Yes";
+    const sessionCount=state.sessions.filter(s=>s.ProgramID===programId&&s.CategoryID===c.CategoryID).length;
+    const confirmedCount=staff.filter(s=>isAnnual?hasConfirmed(s.StaffID,c.CategoryID,thisYear):hasConfirmed(s.StaffID,c.CategoryID)).length;
+
+    const moduleRows=mods.map(m=>{
+      const sesCount=moduleSessionCount(programId,m.ModuleID);
+      const staffDelivered=staff.filter(s=>moduleSessionCount(programId,m.ModuleID,s.StaffID)>0).length;
+      return `
+        <div class="module-row">
+          <div class="module-info">
+            <div class="module-name">${m.ModuleName}</div>
+            <div class="module-meta">${m.Hours} hrs · ${m.Source}</div>
           </div>
-          <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${color}"></div></div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
-            ${cats.map(c => {
-              const isAnnual = c.AnnualRenewal==="Yes";
-              const done = isAnnual ? hasConfirmed(s.StaffID,c.CategoryID,thisYear) : hasConfirmed(s.StaffID,c.CategoryID);
-              return `<span class="badge ${done?'badge-done':isAnnual?'badge-renewal':'badge-todo'}" title="${c.CategoryName}${isAnnual?' (Annual)':''}">${c.CategoryName.split(" ")[0]}${isAnnual?' 🔄':''}</span>`;
-            }).join("")}
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <span style="font-size:.75rem;color:var(--muted)">${staffDelivered}/${staff.length} staff</span>
+            <span class="badge ${sesCount>0?'badge-done':'badge-todo'}">${sesCount>0?sesCount+' session'+(sesCount!==1?'s':''):'Not delivered'}</span>
           </div>
         </div>`;
     }).join("");
-  }
 
-  // Category coverage
-  document.getElementById("dashCatCoverage").innerHTML = cats.map((c,i) => {
-    const sessionCount = state.sessions.filter(s=>s.ProgramID===programId && s.CategoryID===c.CategoryID).length;
-    const isAnnual = c.AnnualRenewal==="Yes";
-    const confirmedCount = staff.filter(s => isAnnual ? hasConfirmed(s.StaffID,c.CategoryID,thisYear) : hasConfirmed(s.StaffID,c.CategoryID)).length;
-    const pct = staff.length ? Math.round((confirmedCount/staff.length)*100) : 0;
     return `
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-        <div style="width:4px;height:36px;background:${CAT_COLORS[i%CAT_COLORS.length]};border-radius:2px;flex-shrink:0"></div>
-        <div style="flex:1">
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px;flex-wrap:wrap;gap:4px">
-            <span style="font-weight:700;font-size:.82rem">${c.CategoryName} ${isAnnual?'<span class="badge badge-save">Annual</span>':''}</span>
-            <span style="font-size:.75rem;color:var(--muted)">${confirmedCount}/${staff.length} confirmed · ${sessionCount} session${sessionCount!==1?"s":""}</span>
+      <div class="cat-section">
+        <div class="cat-section-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+          <div class="cat-color" style="background:${CAT_COLORS[i%CAT_COLORS.length]}"></div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:.88rem;color:${CAT_COLORS[i%CAT_COLORS.length]}">${c.CategoryName} ${isAnnual?'<span class="badge badge-save">Annual</span>':''}</div>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:2px">${mods.length} modules · ${sessionCount} sessions · ${confirmedCount}/${staff.length} confirmed</div>
           </div>
-          <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${CAT_COLORS[i%CAT_COLORS.length]}"></div></div>
+          <span style="color:var(--muted);font-size:.8rem">▼</span>
         </div>
+        <div class="cat-section-body" style="display:none">${moduleRows}</div>
       </div>`;
   }).join("");
 }
 
 // ── LOG SESSION ───────────────────────────────────────────────
 function onLogProgramChange() {
-  const programId = document.getElementById("logProgram")?.value;
-  if (!programId) return;
-  const cats = programCategories(programId);
-  populateSelect("logCategory", cats, "CategoryID","CategoryName");
+  const programId=document.getElementById("logProgram")?.value; if(!programId) return;
+  const cats=programCategories(programId);
+  populateSelect("logCategory",cats,"CategoryID","CategoryName");
   renderLogAttendees(programId);
-  renderModuleRef();
+  onLogCategoryChange();
+}
+
+function onLogCategoryChange() {
+  const catId=document.getElementById("logCategory")?.value; if(!catId) return;
+  const mods=categoryModules(catId);
+  populateSelect("logModule",mods,"ModuleID","ModuleName");
+  onLogModuleChange();
+}
+
+function onLogModuleChange() {
+  const modId=document.getElementById("logModule")?.value;
+  const mod  =state.modules.find(m=>m.ModuleID===modId);
+  if(!mod) { document.getElementById("moduleInfo").style.display="none"; return; }
+  document.getElementById("moduleHours").textContent=mod.Hours+" hours";
+  document.getElementById("moduleSource").textContent="Source: "+mod.Source;
+  document.getElementById("moduleInfo").style.display="block";
+  document.getElementById("saveWarning").style.display=mod.ModuleName.includes("S.A.V.E.")?"block":"none";
 }
 
 function renderLogAttendees(programId) {
-  const staff = activeStaff(programId);
-  const wrap  = document.getElementById("logAttendees");
-  if (!staff.length) { wrap.innerHTML='<span style="color:var(--muted);font-size:.8rem">No staff in this program.</span>'; return; }
-  wrap.innerHTML = staff.map(s=>`
+  const staff=activeStaff(programId);
+  const wrap =document.getElementById("logAttendees");
+  if(!staff.length) { wrap.innerHTML='<span style="color:var(--muted);font-size:.8rem">No staff in this program.</span>'; return; }
+  wrap.innerHTML=staff.map(s=>`
     <label class="check-item">
       <input type="checkbox" value="${s.StaffID}" data-name="${s.FullName}"/>
       <span style="font-size:.82rem">${s.FullName} <span style="color:var(--muted)">(${s.Role})</span></span>
     </label>`).join("");
 }
 
-function renderModuleRef() {
-  const catId = document.getElementById("logCategory")?.value;
-  const cat   = state.categories.find(c=>c.CategoryID===catId);
-  if (!cat) return;
-  const modules = (cat.Modules||"").split("|").map(m=>m.trim()).filter(Boolean);
-  const isAnnual = cat.AnnualRenewal==="Yes";
-  document.getElementById("saveWarning").style.display = isAnnual ? "block" : "none";
-  document.getElementById("logModuleRef").innerHTML = `
-    <div style="font-weight:700;font-size:.75rem;color:var(--muted);margin-bottom:8px">MODULES IN THIS CATEGORY</div>
-    ${modules.map(m=>`
-      <div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid #f3f4f6;font-size:.8rem">
-        <div style="width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:6px"></div>
-        <span style="color:${m.includes('S.A.V.E.')?'var(--save)':'#374151'};font-weight:${m.includes('S.A.V.E.')?700:400}">${m}</span>
-      </div>`).join("")}`;
-}
-
 async function submitSession() {
-  const programId     = document.getElementById("logProgram").value;
-  const categoryId    = document.getElementById("logCategory").value;
-  const sessionDate   = document.getElementById("logDate").value;
-  const deliveryMethod= document.getElementById("logMethod").value;
-  const trainerName   = document.getElementById("logTrainer").value.trim();
-  const notes         = document.getElementById("logNotes").value.trim();
-  const checked       = [...document.querySelectorAll("#logAttendees input:checked")];
-  const attendeeIds   = checked.map(c=>c.value).join(", ");
-  const attendeeNames = checked.map(c=>c.dataset.name).join(", ");
-  const msg           = document.getElementById("logMsg");
+  const programId    =document.getElementById("logProgram").value;
+  const categoryId   =document.getElementById("logCategory").value;
+  const moduleId     =document.getElementById("logModule").value;
+  const mod          =state.modules.find(m=>m.ModuleID===moduleId);
+  const moduleName   =mod?.ModuleName||"";
+  const sessionDate  =document.getElementById("logDate").value;
+  const deliveryMethod=document.getElementById("logMethod").value;
+  const trainerName  =document.getElementById("logTrainer").value.trim();
+  const notes        =document.getElementById("logNotes").value.trim();
+  const checked      =[...document.querySelectorAll("#logAttendees input:checked")];
+  const attendeeIds  =checked.map(c=>c.value).join(", ");
+  const attendeeNames=checked.map(c=>c.dataset.name).join(", ");
+  const msg          =document.getElementById("logMsg");
 
-  if (!trainerName) { msg.innerHTML='<div class="alert alert-error">Please enter your name.</div>'; return; }
-  if (!sessionDate) { msg.innerHTML='<div class="alert alert-error">Please select a date.</div>'; return; }
-  if (!attendeeIds) { msg.innerHTML='<div class="alert alert-error">Please select at least one staff member.</div>'; return; }
+  if(!trainerName) { msg.innerHTML='<div class="alert alert-error">Please enter your name.</div>'; return; }
+  if(!sessionDate) { msg.innerHTML='<div class="alert alert-error">Please select a date.</div>'; return; }
+  if(!moduleId)    { msg.innerHTML='<div class="alert alert-error">Please select a module.</div>'; return; }
+  if(!attendeeIds) { msg.innerHTML='<div class="alert alert-error">Please select at least one staff member.</div>'; return; }
 
   msg.innerHTML='<div class="alert alert-info">Saving...</div>';
-  const res = await api("logSession",{programId,categoryId,trainerName,deliveryMethod,sessionDate,attendeeIds,attendeeNames,notes});
-  if (res.success) {
+  const res=await api("logSession",{programId,categoryId,moduleId,moduleName,trainerName,deliveryMethod,sessionDate,attendeeIds,attendeeNames,notes});
+  if(res.success) {
     msg.innerHTML='<div class="alert alert-success">Session logged successfully!</div>';
-    const d = await api("getBootstrap"); if(d.success) state=d;
+    const d=await api("getBootstrap"); if(d.success) state=d;
     document.getElementById("logTrainer").value="";
     document.getElementById("logNotes").value="";
     document.querySelectorAll("#logAttendees input").forEach(i=>i.checked=false);
-  } else {
-    msg.innerHTML=`<div class="alert alert-error">Error: ${res.error}</div>`;
-  }
+  } else { msg.innerHTML=`<div class="alert alert-error">Error: ${res.error}</div>`; }
 }
 
 // ── HISTORY ───────────────────────────────────────────────────
 function renderHistory() {
-  const filterProg  = document.getElementById("histProgram")?.value||"";
-  const filterStaff = document.getElementById("histStaff")?.value||"";
-  const filterCat   = document.getElementById("histCat")?.value||"";
+  const filterProg =document.getElementById("histProgram")?.value||"";
+  const filterStaff=document.getElementById("histStaff")?.value||"";
+  const filterCat  =document.getElementById("histCat")?.value||"";
 
-  // Populate staff filter based on program selection
-  const staffForFilter = filterProg ? activeStaff(filterProg) : state.staff.filter(s=>s.Active==="Yes");
-  const staffSel = document.getElementById("histStaff");
-  const currentStaffVal = staffSel.value;
-  staffSel.innerHTML = '<option value="">All Staff</option>';
-  staffForFilter.forEach(s => {
-    const o = document.createElement("option");
-    o.value=s.StaffID; o.textContent=s.FullName;
-    if(s.StaffID===currentStaffVal) o.selected=true;
-    staffSel.appendChild(o);
-  });
+  const staffForFilter=filterProg?activeStaff(filterProg):state.staff.filter(s=>s.Active==="Yes");
+  const staffSel=document.getElementById("histStaff");
+  const cur=staffSel.value;
+  staffSel.innerHTML='<option value="">All Staff</option>';
+  staffForFilter.forEach(s=>{ const o=document.createElement("option"); o.value=s.StaffID; o.textContent=s.FullName; if(s.StaffID===cur)o.selected=true; staffSel.appendChild(o); });
 
-  let sessions = state.sessions;
-  let confs    = state.confirmations;
-  if (filterProg)  { sessions=sessions.filter(s=>s.ProgramID===filterProg); confs=confs.filter(c=>c.ProgramID===filterProg); }
-  if (filterStaff) { sessions=sessions.filter(s=>s.AttendeeIDs.includes(filterStaff)); confs=confs.filter(c=>c.StaffID===filterStaff); }
-  if (filterCat)   { sessions=sessions.filter(s=>getCatName(s.CategoryID)===filterCat); confs=confs.filter(c=>c.CategoryName===filterCat); }
+  let sessions=state.sessions;
+  let confs   =state.confirmations;
+  if(filterProg)  { sessions=sessions.filter(s=>s.ProgramID===filterProg); confs=confs.filter(c=>c.ProgramID===filterProg); }
+  if(filterStaff) { sessions=sessions.filter(s=>s.AttendeeIDs&&s.AttendeeIDs.includes(filterStaff)); confs=confs.filter(c=>c.StaffID===filterStaff); }
+  if(filterCat)   { sessions=sessions.filter(s=>getCatName(s.CategoryID)===filterCat); confs=confs.filter(c=>c.CategoryName===filterCat); }
 
-  document.getElementById("histSessions").innerHTML = !sessions.length
+  document.getElementById("histSessions").innerHTML=!sessions.length
     ? '<p style="color:var(--muted);font-size:.82rem">No sessions found.</p>'
-    : `<table><thead><tr><th>Date</th><th>Program</th><th>Category</th><th>Trainer</th><th>Method</th><th>Attendees</th><th>Notes</th></tr></thead>
+    : `<table><thead><tr><th>Date</th><th>Program</th><th>Category</th><th>Module</th><th>Trainer</th><th>Method</th><th>Attendees</th><th>Notes</th></tr></thead>
        <tbody>${sessions.slice().reverse().map(s=>`<tr>
          <td>${s.SessionDate}</td><td>${getProgramName(s.ProgramID)}</td>
-         <td>${getCatName(s.CategoryID)}</td><td>${s.TrainerName}</td>
-         <td>${s.DeliveryMethod}</td><td>${s.AttendeeNames}</td><td>${s.Notes||""}</td>
+         <td>${getCatName(s.CategoryID)}</td><td>${s.ModuleName||""}</td>
+         <td>${s.TrainerName}</td><td>${s.DeliveryMethod}</td>
+         <td>${s.AttendeeNames}</td><td>${s.Notes||""}</td>
        </tr>`).join("")}</tbody></table>`;
 
-  document.getElementById("histConfirmations").innerHTML = !confs.length
+  document.getElementById("histConfirmations").innerHTML=!confs.length
     ? '<p style="color:var(--muted);font-size:.82rem">No confirmations found.</p>'
     : `<table><thead><tr><th>Date</th><th>Staff Name</th><th>Program</th><th>Category</th><th>Annual?</th><th>Year</th></tr></thead>
        <tbody>${confs.slice().reverse().map(c=>`<tr>
@@ -758,23 +735,19 @@ function renderHistory() {
 }
 
 // ── MANAGE ────────────────────────────────────────────────────
-function populateRosterPrograms() {
-  const progs = state.programs.filter(p=>p.Active==="Yes");
-  const sel   = document.getElementById("rosterProgram");
-  sel.innerHTML = '<option value="">All Programs</option>';
-  progs.forEach(p=>{ const o=document.createElement("option"); o.value=p.ProgramID; o.textContent=p.ProgramName; sel.appendChild(o); });
-}
-
 function renderManage() {
-  const progs = state.programs.filter(p=>p.Active==="Yes");
-  populateSelect("mgmtStaffProgram", progs, "ProgramID","ProgramName");
+  const progs=state.programs.filter(p=>p.Active==="Yes");
+  populateSelect("mgmtStaffProgram",progs,"ProgramID","ProgramName");
+  const rp=document.getElementById("rosterProgram");
+  rp.innerHTML='<option value="">All Programs</option>';
+  progs.forEach(p=>{ const o=document.createElement("option"); o.value=p.ProgramID; o.textContent=p.ProgramName; rp.appendChild(o); });
   renderRoster();
 }
 
 function renderRoster() {
-  const filterProg = document.getElementById("rosterProgram")?.value||"";
-  const staff = state.staff.filter(s=>s.Active==="Yes" && (!filterProg||s.ProgramID===filterProg));
-  document.getElementById("rosterList").innerHTML = !staff.length
+  const fp=document.getElementById("rosterProgram")?.value||"";
+  const staff=state.staff.filter(s=>s.Active==="Yes"&&(!fp||s.ProgramID===fp));
+  document.getElementById("rosterList").innerHTML=!staff.length
     ? '<p style="color:var(--muted);font-size:.82rem">No staff found.</p>'
     : `<table><thead><tr><th>Name</th><th>Role</th><th>Program</th><th>Added</th></tr></thead>
        <tbody>${staff.map(s=>`<tr>
@@ -784,16 +757,16 @@ function renderRoster() {
 }
 
 async function addProgram() {
-  if (userRole!=="Admin") { alert("Admin access required."); return; }
-  const programName  = document.getElementById("mgmtProgName").value.trim();
-  const programTypeId= document.getElementById("mgmtProgType").value;
-  const site         = document.getElementById("mgmtSite").value.trim();
-  const organization = document.getElementById("mgmtOrg").value.trim();
-  const msg          = document.getElementById("mgmtProgMsg");
-  if (!programName||!site||!organization) { msg.innerHTML='<div class="alert alert-error">Please fill in all fields.</div>'; return; }
+  if(userRole!=="Admin"){alert("Admin access required.");return;}
+  const programName  =document.getElementById("mgmtProgName").value.trim();
+  const programTypeId=document.getElementById("mgmtProgType").value;
+  const site         =document.getElementById("mgmtSite").value.trim();
+  const organization =document.getElementById("mgmtOrg").value.trim();
+  const msg          =document.getElementById("mgmtProgMsg");
+  if(!programName||!site||!organization){msg.innerHTML='<div class="alert alert-error">Please fill in all fields.</div>';return;}
   msg.innerHTML='<div class="alert alert-info">Saving...</div>';
-  const res = await api("addProgram",{programName,programTypeId,site,organization});
-  if (res.success) {
+  const res=await api("addProgram",{programName,programTypeId,site,organization});
+  if(res.success){
     msg.innerHTML='<div class="alert alert-success">Program added!</div>';
     const d=await api("getBootstrap"); if(d.success){state=d;initUI();}
     document.getElementById("mgmtProgName").value="";
@@ -803,16 +776,16 @@ async function addProgram() {
 }
 
 async function addStaff() {
-  const programId = document.getElementById("mgmtStaffProgram").value;
-  const fullName  = document.getElementById("mgmtStaffName").value.trim();
-  const role      = document.getElementById("mgmtStaffRole").value;
-  const msg       = document.getElementById("mgmtStaffMsg");
-  if (!fullName) { msg.innerHTML='<div class="alert alert-error">Please enter a name.</div>'; return; }
+  const programId=document.getElementById("mgmtStaffProgram").value;
+  const fullName =document.getElementById("mgmtStaffName").value.trim();
+  const role     =document.getElementById("mgmtStaffRole").value;
+  const msg      =document.getElementById("mgmtStaffMsg");
+  if(!fullName){msg.innerHTML='<div class="alert alert-error">Please enter a name.</div>';return;}
   msg.innerHTML='<div class="alert alert-info">Saving...</div>';
-  const res = await api("addStaff",{programId,fullName,role});
-  if (res.success) {
+  const res=await api("addStaff",{programId,fullName,role});
+  if(res.success){
     msg.innerHTML='<div class="alert alert-success">Staff member added!</div>';
-    const d=await api("getBootstrap"); if(d.success){state=d;initUI();renderManage();populateRosterPrograms();}
+    const d=await api("getBootstrap"); if(d.success){state=d;initUI();renderManage();}
     document.getElementById("mgmtStaffName").value="";
   } else { msg.innerHTML=`<div class="alert alert-error">Error: ${res.error}</div>`; }
 }

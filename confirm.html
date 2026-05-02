@@ -42,21 +42,25 @@ body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color
 .badge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .badge-done{background:#d1fae5;color:#065f46}
 .badge-save{background:#ede9fe;color:#5b21b6}
+.badge-partial{background:#fef3c7;color:#92400e}
 .cat-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
 .cat-card-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;font-weight:700;font-size:.88rem}
 .cat-card-body{padding:14px 16px;background:#fafafa;border-top:1px solid var(--border)}
-.module-item{display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:.8rem;color:#374151;border-bottom:1px solid #f3f4f6}
-.module-item:last-child{border-bottom:none}
-.module-bullet{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:6px}
+.module-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:.78rem;border-bottom:1px solid #f3f4f6;gap:8px}
+.module-row:last-child{border-bottom:none}
+.module-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .attest-box{background:#fff8f1;border:1px solid #fed7aa;border-radius:6px;padding:12px 14px;margin-bottom:12px;font-size:.78rem;color:#7c2d12;line-height:1.7}
-.done-screen{text-align:center;padding:40px 20px}
-.done-icon{font-size:3rem;margin-bottom:12px}
-.done-title{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--emerald)}
-.done-sub{color:var(--muted);font-size:.85rem;line-height:1.6}
+.locked-box{background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:10px 12px;font-size:.78rem;color:var(--muted);display:flex;align-items:flex-start;gap:8px}
 .confirm-hero{text-align:center;padding:24px 16px 16px}
 .confirm-icon{font-size:2.5rem;margin-bottom:10px}
 .confirm-title{font-size:1.1rem;font-weight:700;margin-bottom:6px}
 .confirm-sub{color:var(--muted);font-size:.82rem;line-height:1.6}
+.done-screen{text-align:center;padding:40px 20px}
+.done-icon{font-size:3rem;margin-bottom:12px}
+.done-title{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--emerald)}
+.done-sub{color:var(--muted);font-size:.85rem;line-height:1.6}
+.progress-wrap{background:#e5e7eb;border-radius:99px;height:6px;overflow:hidden;margin-top:4px}
+.progress-bar{height:100%;border-radius:99px;transition:width .4s ease}
 </style>
 </head>
 <body>
@@ -78,7 +82,7 @@ body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color
       <div class="confirm-hero">
         <div class="confirm-icon">👋</div>
         <div class="confirm-title">Welcome</div>
-        <div class="confirm-sub">Select your program and name to view and confirm your training categories.</div>
+        <div class="confirm-sub">Select your program and name to view your training progress and confirm completed categories.</div>
       </div>
       <div class="card">
         <div class="card-header">Who Are You?</div>
@@ -101,10 +105,10 @@ body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color
       <div class="confirm-hero">
         <div class="confirm-icon">📋</div>
         <div class="confirm-title" id="staffLabel"></div>
-        <div class="confirm-sub">Confirm each category once you have completed all training within it. Your confirmation is timestamped and permanently recorded.</div>
+        <div class="confirm-sub">Each category shows your module progress. Once all modules in a category have been delivered you can confirm that category.</div>
       </div>
       <div id="saveNotice" style="display:none" class="alert alert-save">
-        ⚠️ <strong>S.A.V.E. Suicide Prevention Training</strong> is a VA-required annual renewal. Your confirmation for this category will be recorded for the current calendar year (<span id="saveYear"></span>).
+        ⚠️ <strong>S.A.V.E. Suicide Prevention Training</strong> is a VA required annual renewal. Your confirmation for this category is recorded for calendar year <span id="saveYear"></span>.
       </div>
       <div id="catList"></div>
       <button class="btn btn-outline" onclick="goBack()" style="margin-top:4px">← Back</button>
@@ -120,9 +124,9 @@ body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color
       <button class="btn btn-outline" onclick="goBack()" style="margin-top:16px">← Back to Start</button>
     </div>
 
-    <!-- Update URL -->
+    <!-- Update URL link -->
     <div style="text-align:center;margin-top:24px">
-      <button onclick="document.getElementById('updateUrlSection').style.display='block'" 
+      <button onclick="document.getElementById('updateUrlSection').style.display='block'"
         style="background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;text-decoration:underline">
         Update Apps Script URL
       </button>
@@ -147,37 +151,31 @@ let SCRIPT_URL   = localStorage.getItem(CONFIG_KEY) || "";
 const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c","#5c1a2e"];
 const THIS_YEAR  = new Date().getFullYear();
 
-let state = { programs:[], staff:[], categories:[], confirmations:[], sessions:[] };
+let state = { programs:[], staff:[], categories:[], modules:[], confirmations:[], sessions:[] };
 let currentProgramId = "";
 let currentStaffId   = "";
 
 window.addEventListener("load", () => {
   if (!SCRIPT_URL) {
-    // Prompt for URL inline
     document.getElementById("loadingState").innerHTML = `
       <div style="max-width:440px;margin:0 auto">
         <div class="alert alert-info">Please enter the Apps Script URL provided by your program administrator.</div>
         <input type="url" id="inlineUrl" class="form-control" placeholder="https://script.google.com/macros/s/..." style="margin-bottom:10px"/>
         <button class="btn btn-primary btn-block" onclick="saveInlineUrl()">Connect</button>
       </div>`;
-  } else {
-    loadData();
-  }
+  } else { loadData(); }
 });
 
 function saveInlineUrl() {
   const url = document.getElementById("inlineUrl").value.trim();
   if (!url.startsWith("https://script.google.com")) { alert("Please enter a valid Apps Script URL."); return; }
-  localStorage.setItem(CONFIG_KEY, url);
-  SCRIPT_URL = url;
-  loadData();
+  localStorage.setItem(CONFIG_KEY, url); SCRIPT_URL = url; loadData();
 }
 
 function updateScriptUrl() {
   const url = document.getElementById("updateUrl").value.trim();
   if (!url.startsWith("https://script.google.com")) { alert("Please enter a valid Apps Script URL."); return; }
-  localStorage.setItem(CONFIG_KEY, url);
-  SCRIPT_URL = url;
+  localStorage.setItem(CONFIG_KEY, url); SCRIPT_URL = url;
   document.getElementById("updateUrlSection").style.display = "none";
   loadData();
 }
@@ -185,9 +183,9 @@ function updateScriptUrl() {
 async function loadData() {
   show("loadingState");
   try {
-    const r = await fetch(`${SCRIPT_URL}?action=getConfirmBootstrap`);
+    const r    = await fetch(`${SCRIPT_URL}?action=getConfirmBootstrap`);
     const data = await r.json();
-    if (data.success) { state = data; initUI(); }
+    if (data.success) { state=data; initUI(); }
     else { document.getElementById("loadingState").innerHTML=`<div class="alert alert-error">Could not load: ${data.error}</div>`; }
   } catch(e) {
     document.getElementById("loadingState").innerHTML=`<div class="alert alert-error">Connection error.</div>`;
@@ -196,16 +194,15 @@ async function loadData() {
 
 function initUI() {
   const progs = state.programs.filter(p=>p.Active==="Yes");
-  const sel   = document.getElementById("confProgram");
-  sel.innerHTML = progs.map(p=>`<option value="${p.ProgramID}">${p.ProgramName}</option>`).join("");
-  onProgramChange();
+  document.getElementById("confProgram").innerHTML = progs.map(p=>`<option value="${p.ProgramID}">${p.ProgramName}</option>`).join("");
   document.getElementById("saveYear").textContent = THIS_YEAR;
+  onProgramChange();
   show("step1");
 }
 
 function onProgramChange() {
   const pid   = document.getElementById("confProgram").value;
-  const staff = state.staff.filter(s=>s.ProgramID===pid && s.Active==="Yes");
+  const staff = state.staff.filter(s=>s.ProgramID===pid&&s.Active==="Yes");
   document.getElementById("confStaff").innerHTML = staff.map(s=>`<option value="${s.StaffID}">${s.FullName}</option>`).join("");
 }
 
@@ -215,12 +212,9 @@ function loadCategories() {
   const staffObj   = state.staff.find(s=>s.StaffID===currentStaffId);
   if (!staffObj) return;
   document.getElementById("staffLabel").textContent = staffObj.FullName + " · " + staffObj.Role;
-
-  // Show S.A.V.E. notice if this program type has annual categories
-  const cats = getCategories();
+  const cats    = getCategories();
   const hasAnnual = cats.some(c=>c.AnnualRenewal==="Yes");
   document.getElementById("saveNotice").style.display = hasAnnual ? "block" : "none";
-
   renderCategories();
   show("step2");
 }
@@ -228,57 +222,75 @@ function loadCategories() {
 function getCategories() {
   const prog = state.programs.find(p=>p.ProgramID===currentProgramId);
   if (!prog) return [];
-  return state.categories
-    .filter(c=>c.ProgramTypeID===prog.ProgramTypeID)
-    .sort((a,b)=>a.CategoryOrder-b.CategoryOrder);
+  return state.categories.filter(c=>c.ProgramTypeID===prog.ProgramTypeID).sort((a,b)=>a.CategoryOrder-b.CategoryOrder);
 }
 
-function hasConfirmed(staffId, categoryId, year=null) {
-  return state.confirmations.some(c=>{
-    const match = c.StaffID===staffId && c.CategoryID===categoryId;
-    if (!year) return match;
-    return match && String(c.RenewalYear)===String(year);
-  });
+function getCategoryModules(categoryId) {
+  return state.modules.filter(m=>m.CategoryID===categoryId).sort((a,b)=>a.ModuleOrder-b.ModuleOrder);
 }
 
-function hasSession(staffId, programId, categoryId) {
-  return state.sessions.some(s =>
-    s.ProgramID === programId &&
-    s.CategoryID === categoryId &&
+function hasModuleSession(staffId, programId, moduleId) {
+  return state.sessions.some(s=>
+    s.ProgramID===programId &&
+    s.ModuleID===moduleId &&
     s.AttendeeIDs && s.AttendeeIDs.includes(staffId)
   );
 }
 
+function hasConfirmed(staffId, categoryId, year=null) {
+  return state.confirmations.some(c=>{
+    const match=c.StaffID===staffId&&c.CategoryID===categoryId;
+    if(!year) return match;
+    return match&&String(c.RenewalYear)===String(year);
+  });
+}
+
 function renderCategories() {
   const cats = getCategories();
-  const allDone = cats.every(c => {
-    return c.AnnualRenewal==="Yes"
-      ? hasConfirmed(currentStaffId, c.CategoryID, THIS_YEAR)
-      : hasConfirmed(currentStaffId, c.CategoryID);
-  });
 
-  if (allDone && cats.length>0) { show("doneScreen"); return; }
+  if (!cats.length) {
+    document.getElementById("catList").innerHTML=`<div class="alert alert-error">No training categories found for this program. Please contact your program manager.</div>`;
+    return;
+  }
+
+  const allDone = cats.length>0 && cats.every(c=>{
+    return c.AnnualRenewal==="Yes"
+      ? hasConfirmed(currentStaffId,c.CategoryID,THIS_YEAR)
+      : hasConfirmed(currentStaffId,c.CategoryID);
+  });
+  if (allDone) { show("doneScreen"); return; }
 
   document.getElementById("catList").innerHTML = cats.map((c,i)=>{
-    const isAnnual    = c.AnnualRenewal==="Yes";
-    const done        = isAnnual
-      ? hasConfirmed(currentStaffId, c.CategoryID, THIS_YEAR)
-      : hasConfirmed(currentStaffId, c.CategoryID);
-    const sessionLogged = hasSession(currentStaffId, currentProgramId, c.CategoryID);
-    const conf        = state.confirmations.find(cf=>cf.StaffID===currentStaffId && cf.CategoryID===c.CategoryID && (!isAnnual || String(cf.RenewalYear)===String(THIS_YEAR)));
-    const modules     = (c.Modules||"").split("|").map(m=>m.trim()).filter(Boolean);
+    const isAnnual  = c.AnnualRenewal==="Yes";
+    const done      = isAnnual ? hasConfirmed(currentStaffId,c.CategoryID,THIS_YEAR) : hasConfirmed(currentStaffId,c.CategoryID);
+    const conf      = state.confirmations.find(cf=>cf.StaffID===currentStaffId&&cf.CategoryID===c.CategoryID&&(!isAnnual||String(cf.RenewalYear)===String(THIS_YEAR)));
+    const mods      = getCategoryModules(c.CategoryID);
+    const delivered = mods.filter(m=>hasModuleSession(currentStaffId,currentProgramId,m.ModuleID)).length;
+    const allModsDone = delivered===mods.length && mods.length>0;
+    const pct       = mods.length ? Math.round((delivered/mods.length)*100) : 0;
+
+    // Module list
+    const moduleRows = mods.map(m=>{
+      const modDone = hasModuleSession(currentStaffId,currentProgramId,m.ModuleID);
+      return `
+        <div class="module-row">
+          <div class="module-dot" style="background:${modDone?'var(--emerald)':'#d1d5db'}"></div>
+          <span style="flex:1;color:${modDone?'#111827':'var(--muted)'};">${m.ModuleName}</span>
+          <span style="font-size:.7rem;color:${modDone?'var(--emerald)':'var(--muted)'};">${modDone?'✓ Delivered':'Pending'}</span>
+        </div>`;
+    }).join("");
 
     let actionHtml;
     if (done) {
-      actionHtml = `<p style="color:#065f46;font-size:.78rem;font-weight:700">✓ Confirmed on ${fmtDate(conf?.ConfirmedAt)}${isAnnual?" for "+THIS_YEAR:""}</p>`;
-    } else if (!sessionLogged) {
+      actionHtml = `<p style="color:#065f46;font-size:.78rem;font-weight:700;margin-top:10px">✓ Confirmed on ${fmtDate(conf?.ConfirmedAt)}${isAnnual?" for "+THIS_YEAR:""}</p>`;
+    } else if (!allModsDone) {
       actionHtml = `
-        <div style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:10px 12px;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:8px">
-          🔒 <span>Training has not been delivered yet. Your program manager must log a session for this category before you can confirm.</span>
+        <div class="locked-box" style="margin-top:10px">
+          🔒 <span><strong>${delivered} of ${mods.length} modules delivered.</strong> All modules must be delivered before you can confirm this category. Check back after your next training session.</span>
         </div>`;
     } else {
       actionHtml = `
-        <div class="attest-box">
+        <div class="attest-box" style="margin-top:10px">
           <strong>Electronic Attestation</strong><br/><br/>
           I attest that I have personally completed the training identified above in its entirety.
           I understand that this acknowledgement is recorded electronically with my authenticated
@@ -292,23 +304,18 @@ function renderCategories() {
 
     return `
       <div class="cat-card">
-        <div class="cat-card-header" style="background:${CAT_COLORS[i%CAT_COLORS.length]};opacity:${!sessionLogged&&!done?0.7:1}">
+        <div class="cat-card-header" style="background:${CAT_COLORS[i%CAT_COLORS.length]}">
           <span>${c.CategoryName}</span>
           <div style="display:flex;gap:6px;align-items:center">
             ${isAnnual?`<span class="badge badge-save">Annual ${THIS_YEAR}</span>`:""}
-            ${done?`<span class="badge badge-done">Confirmed ✓</span>`:""}
-            ${!sessionLogged&&!done?`<span class="badge" style="background:#e5e7eb;color:#6b7280">Not Yet Delivered</span>`:""}
+            ${done?`<span class="badge badge-done">Confirmed ✓</span>`:allModsDone?`<span class="badge badge-done" style="background:#bbf7d0;color:#166534">Ready to Confirm</span>`:`<span class="badge badge-partial">${delivered}/${mods.length} Modules</span>`}
           </div>
         </div>
         <div class="cat-card-body">
-          ${isAnnual&&sessionLogged?`<div class="alert alert-save" style="margin-bottom:10px;font-size:.76rem">⚠️ This category includes <strong>S.A.V.E. Suicide Prevention Training</strong> which is required annually by the VA. Your confirmation will be recorded for <strong>${THIS_YEAR}</strong>.</div>`:""}
-          <div style="margin-bottom:12px">
-            ${modules.map(m=>`
-              <div class="module-item">
-                <div class="module-bullet" style="background:${m.includes('S.A.V.E.')?'var(--save)':'var(--muted)'}"></div>
-                <span style="color:${m.includes('S.A.V.E.')?'var(--save)':'#374151'};font-weight:${m.includes('S.A.V.E.')?700:400}">${m}</span>
-              </div>`).join("")}
-          </div>
+          ${isAnnual&&allModsDone?`<div class="alert alert-save" style="margin-bottom:10px;font-size:.76rem">⚠️ This category includes <strong>S.A.V.E. Suicide Prevention Training</strong> required annually by the VA. Confirmation recorded for <strong>${THIS_YEAR}</strong>.</div>`:""}
+          <div style="margin-bottom:4px;font-size:.7rem;font-weight:700;color:var(--muted)">MODULE PROGRESS</div>
+          <div class="progress-wrap" style="margin-bottom:10px"><div class="progress-bar" style="width:${pct}%;background:${done?'var(--emerald)':allModsDone?'#22c55e':CAT_COLORS[i%CAT_COLORS.length]}"></div></div>
+          ${moduleRows}
           ${actionHtml}
         </div>
       </div>`;
@@ -318,41 +325,32 @@ function renderCategories() {
 async function confirmCategory(categoryId, categoryName, annualRenewal) {
   const staffObj = state.staff.find(s=>s.StaffID===currentStaffId);
   const isAnnual = annualRenewal==="true";
-  const confirmMsg = isAnnual
-    ? `Confirm completion of "${categoryName}" for ${THIS_YEAR}?\n\nThis includes S.A.V.E. Annual Renewal and will be recorded with a timestamp.`
-    : `Confirm completion of "${categoryName}"?\n\nBy confirming you attest that you have personally completed all training in this category. This is recorded electronically.`;
+  if (!confirm(`Confirm completion of "${categoryName}"?\n\nBy confirming you attest that you have personally completed all training in this category. This is recorded electronically and permanently.`)) return;
 
-  if (!confirm(confirmMsg)) return;
-
-  const res = await fetch(SCRIPT_URL, {
+  const res = await fetch(SCRIPT_URL,{
     method:"POST",
-    body: JSON.stringify({
+    body:JSON.stringify({
       action:"confirmCategory",
       staffId:currentStaffId,
       staffName:staffObj.FullName,
       programId:currentProgramId,
-      categoryId,
-      categoryName,
-      annualRenewal: isAnnual?"Yes":"No"
+      categoryId, categoryName,
+      annualRenewal:isAnnual?"Yes":"No"
     })
   });
   const data = await res.json();
-
   if (data.success) {
-    const r = await fetch(`${SCRIPT_URL}?action=getConfirmBootstrap`);
-    const d = await r.json();
-    if (d.success) state=d;
+    const r=await fetch(`${SCRIPT_URL}?action=getConfirmBootstrap`);
+    const d=await r.json(); if(d.success) state=d;
     renderCategories();
-  } else {
-    alert("Error saving: "+data.error);
-  }
+  } else { alert("Error saving: "+data.error); }
 }
 
 function goBack() { show("step1"); }
 
 function fmtDate(iso) {
-  if (!iso) return "";
-  const d = new Date(iso);
+  if(!iso) return "";
+  const d=new Date(iso);
   return isNaN(d)?iso:d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
 }
 
