@@ -1,174 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>VMC Training Confirmation</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --navy:    #0d2137;
-    --blue:    #1a3a5c;
-    --green:   #1e5c3a;
-    --gold:    #c9a84c;
-    --light:   #f8f7f4;
-    --white:   #ffffff;
-    --border:  #e5e7eb;
-    --text:    #1a1a1a;
-    --muted:   #6b7280;
-    --amber:   #f59e0b;
-    --emerald: #10b981;
-  }
-
-  body {
-    font-family: 'Georgia', 'Times New Roman', serif;
-    background: var(--light);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  .header {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 60%, var(--green) 100%);
-    padding: 20px 24px 16px;
-    border-bottom: 3px solid var(--gold);
-    text-align: center;
-  }
-  .header-icon { font-size: 2rem; margin-bottom: 8px; }
-  .header-tag {
-    color: var(--gold); font-size: 0.65rem;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;
-  }
-  .header-title { color: #fff; font-size: 1.2rem; font-weight: 700; }
-  .header-sub   { color: #93b4d0; font-size: 0.75rem; margin-top: 4px; }
-
-  .page { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
-
-  .card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
-    margin-bottom: 16px;
-  }
-  .card-header {
-    background: var(--navy); color: var(--gold);
-    padding: 10px 16px; font-size: 0.75rem;
-    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  }
-  .card-body { padding: 16px; }
-
-  .form-group { margin-bottom: 14px; }
-  .form-label {
-    display: block; font-size: 0.7rem; font-weight: 700;
-    color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.05em; margin-bottom: 5px;
-  }
-  .form-control {
-    width: 100%; border: 1.5px solid var(--border);
-    border-radius: 7px; padding: 9px 12px;
-    font-family: inherit; font-size: 0.85rem;
-    color: var(--text); background: #fafafa;
-    outline: none; transition: border-color 0.15s;
-  }
-  .form-control:focus { border-color: var(--blue); background: var(--white); }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    border: none; border-radius: 7px;
-    padding: 10px 20px; cursor: pointer;
-    font-family: inherit; font-size: 0.85rem; font-weight: 700;
-    transition: opacity 0.15s; width: 100%;
-  }
-  .btn:hover { opacity: 0.88; }
-  .btn-primary { background: var(--navy); color: var(--white); }
-  .btn-gold    { background: var(--gold); color: var(--navy); }
-  .btn-outline {
-    background: none; color: var(--navy);
-    border: 1.5px solid var(--navy);
-  }
-
-  .alert {
-    border-radius: 8px; padding: 10px 14px;
-    font-size: 0.8rem; margin-bottom: 14px;
-    border-left: 4px solid;
-  }
-  .alert-info    { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
-  .alert-warning { background: #fffbeb; border-color: var(--gold); color: #78350f; }
-  .alert-success { background: #d1fae5; border-color: var(--emerald); color: #065f46; }
-  .alert-error   { background: #fee2e2; border-color: #dc2626; color: #991b1b; }
-
-  .loading {
-    text-align: center; padding: 40px; color: var(--muted); font-size: 0.9rem;
-  }
-  .spinner {
-    display: inline-block; width: 28px; height: 28px;
-    border: 3px solid var(--border); border-top-color: var(--navy);
-    border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .confirm-hero { text-align: center; padding: 24px 16px 16px; }
-  .confirm-icon  { font-size: 2.5rem; margin-bottom: 10px; }
-  .confirm-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-  .confirm-sub   { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
-
-  .cat-card {
-    border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
-    margin-bottom: 12px;
-  }
-  .cat-card-header {
-    padding: 12px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    color: #fff; font-weight: 700; font-size: 0.88rem;
-  }
-  .cat-card-body {
-    padding: 14px 16px;
-    background: #fafafa;
-    border-top: 1px solid var(--border);
-  }
-
-  .badge {
-    display: inline-block; border-radius: 4px;
-    padding: 2px 8px; font-size: 0.65rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.04em;
-  }
-  .badge-done { background: #d1fae5; color: #065f46; }
-
-  .module-item {
-    display: flex; align-items: flex-start; gap: 8px;
-    padding: 4px 0; font-size: 0.8rem; color: #374151;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .module-item:last-child { border-bottom: none; }
-  .module-bullet {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--muted); flex-shrink: 0; margin-top: 6px;
-  }
-
-  .attest-box {
-    background: #fffbeb; border: 1px solid #fcd34d;
-    border-radius: 6px; padding: 10px 12px;
-    margin-bottom: 10px; font-size: 0.78rem; color: #78350f;
-    line-height: 1.5;
-  }
-
-  .done-screen {
-    text-align: center; padding: 40px 20px;
-  }
-  .done-icon  { font-size: 3rem; margin-bottom: 12px; }
-  .done-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: var(--emerald); }
-  .done-sub   { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
-
-  /* Config screen */
-  .config-banner {
-    background: var(--navy); color: var(--white);
-    border-radius: 10px; padding: 20px;
-    text-align: center; margin-bottom: 20px;
-  }
-  .config-banner h2 { color: var(--gold); margin-bottom: 8px; }
-  .config-banner p  { font-size: 0.82rem; color: #93b4d0; line-height: 1.6; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d2137;--blue:#1a3a5c;--green:#1e5c3a;--gold:#c9a84c;
+  --light:#f8f7f4;--white:#fff;--border:#e5e7eb;--text:#1a1a1a;
+  --muted:#6b7280;--amber:#f59e0b;--emerald:#10b981;--save:#7c3aed;
+}
+body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color:var(--text);min-height:100vh}
+.header{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,var(--green) 100%);padding:20px 24px 16px;border-bottom:3px solid var(--gold);text-align:center}
+.header-icon{font-size:2rem;margin-bottom:8px}
+.header-tag{color:var(--gold);font-size:.65rem;font-family:'Courier New',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.header-title{color:#fff;font-size:1.2rem;font-weight:700}
+.header-sub{color:#93b4d0;font-size:.75rem;margin-top:4px}
+.page{max-width:600px;margin:0 auto;padding:20px 16px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.card-header{background:var(--navy);color:var(--gold);padding:10px 16px;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.card-body{padding:16px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.form-control{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-family:inherit;font-size:.85rem;color:var(--text);background:#fafafa;outline:none;transition:border-color .15s}
+.form-control:focus{border-color:var(--blue);background:var(--white)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:7px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;transition:opacity .15s;width:100%}
+.btn:hover{opacity:.88}
+.btn-primary{background:var(--navy);color:var(--white)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-outline{background:none;color:var(--navy);border:1.5px solid var(--navy)}
+.alert{border-radius:8px;padding:10px 14px;font-size:.8rem;margin-bottom:14px;border-left:4px solid}
+.alert-info{background:#eff6ff;border-color:#3b82f6;color:#1e40af}
+.alert-warning{background:#fffbeb;border-color:var(--gold);color:#78350f}
+.alert-success{background:#d1fae5;border-color:var(--emerald);color:#065f46}
+.alert-error{background:#fee2e2;border-color:#dc2626;color:#991b1b}
+.alert-save{background:#ede9fe;border-color:var(--save);color:#5b21b6}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:.9rem}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.badge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge-done{background:#d1fae5;color:#065f46}
+.badge-save{background:#ede9fe;color:#5b21b6}
+.cat-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.cat-card-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;font-weight:700;font-size:.88rem}
+.cat-card-body{padding:14px 16px;background:#fafafa;border-top:1px solid var(--border)}
+.module-item{display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:.8rem;color:#374151;border-bottom:1px solid #f3f4f6}
+.module-item:last-child{border-bottom:none}
+.module-bullet{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:6px}
+.attest-box{background:#fff8f1;border:1px solid #fed7aa;border-radius:6px;padding:12px 14px;margin-bottom:12px;font-size:.78rem;color:#7c2d12;line-height:1.7}
+.done-screen{text-align:center;padding:40px 20px}
+.done-icon{font-size:3rem;margin-bottom:12px}
+.done-title{font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--emerald)}
+.done-sub{color:var(--muted);font-size:.85rem;line-height:1.6}
+.confirm-hero{text-align:center;padding:24px 16px 16px}
+.confirm-icon{font-size:2.5rem;margin-bottom:10px}
+.confirm-title{font-size:1.1rem;font-weight:700;margin-bottom:6px}
+.confirm-sub{color:var(--muted);font-size:.82rem;line-height:1.6}
 </style>
 </head>
 <body>
@@ -177,41 +65,16 @@
   <div class="header-icon">✅</div>
   <div class="header-tag">VMC · Staff Portal</div>
   <div class="header-title">Training Confirmation</div>
-  <div class="header-sub">Homeless Veterans' Reintegration Program</div>
+  <div class="header-sub">Veterans Multi-Service Center</div>
 </div>
 
-<!-- Config screen -->
-<div id="configScreen" style="display:none;">
-  <div class="page">
-    <div class="config-banner">
-      <h2>Setup Required</h2>
-      <p>This page needs to be connected to the VMC Google Sheet. Contact your program manager for the Apps Script URL.</p>
-    </div>
-    <div class="card">
-      <div class="card-header">Connect to Google Sheet</div>
-      <div class="card-body">
-        <div class="form-group">
-          <label class="form-label">Apps Script URL</label>
-          <input type="url" id="configUrl" class="form-control"
-            placeholder="https://script.google.com/macros/s/..." />
-        </div>
-        <button class="btn btn-primary" onclick="saveConfig()">Connect</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Main app -->
-<div id="mainApp" style="display:none;">
+<div id="mainApp">
   <div class="page">
 
-    <!-- Loading -->
-    <div id="loadingState" class="loading">
-      <div class="spinner"></div><br/>Loading...
-    </div>
+    <div id="loadingState" class="loading"><div class="spinner"></div><br/>Loading...</div>
 
-    <!-- Step 1: Select who you are -->
-    <div id="step1" style="display:none;">
+    <!-- Step 1 -->
+    <div id="step1" style="display:none">
       <div class="confirm-hero">
         <div class="confirm-icon">👋</div>
         <div class="confirm-title">Welcome</div>
@@ -233,31 +96,28 @@
       </div>
     </div>
 
-    <!-- Step 2: Category confirmations -->
-    <div id="step2" style="display:none;">
+    <!-- Step 2 -->
+    <div id="step2" style="display:none">
       <div class="confirm-hero">
         <div class="confirm-icon">📋</div>
         <div class="confirm-title" id="staffLabel"></div>
-        <div class="confirm-sub">
-          Confirm each category once you have completed all training within it.
-          Your confirmation is timestamped and recorded to your Google Sheet.
-        </div>
+        <div class="confirm-sub">Confirm each category once you have completed all training within it. Your confirmation is timestamped and permanently recorded.</div>
+      </div>
+      <div id="saveNotice" style="display:none" class="alert alert-save">
+        ⚠️ <strong>S.A.V.E. Suicide Prevention Training</strong> is a VA-required annual renewal. Your confirmation for this category will be recorded for the current calendar year (<span id="saveYear"></span>).
       </div>
       <div id="catList"></div>
-      <button class="btn btn-outline" onclick="goBack()" style="margin-top:4px;">← Back</button>
+      <button class="btn btn-outline" onclick="goBack()" style="margin-top:4px">← Back</button>
     </div>
 
-    <!-- Done screen (all confirmed) -->
-    <div id="doneScreen" style="display:none;">
+    <!-- Done -->
+    <div id="doneScreen" style="display:none">
       <div class="done-screen">
         <div class="done-icon">🎖️</div>
         <div class="done-title">All Categories Confirmed!</div>
-        <div class="done-sub">
-          You have confirmed all training categories. Your records have been saved.<br><br>
-          Thank you for completing your HVRP staff training.
-        </div>
+        <div class="done-sub">You have confirmed all required training categories. Your records have been saved.<br><br>Thank you for completing your staff training.</div>
       </div>
-      <button class="btn btn-outline" onclick="goBack()" style="margin-top:16px;">← Back to Start</button>
+      <button class="btn btn-outline" onclick="goBack()" style="margin-top:16px">← Back to Start</button>
     </div>
 
   </div>
@@ -265,138 +125,141 @@
 
 <script>
 const CONFIG_KEY = "vmc_training_script_url";
-let SCRIPT_URL = localStorage.getItem(CONFIG_KEY) || "";
+let SCRIPT_URL   = localStorage.getItem(CONFIG_KEY) || "";
+const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c","#5c1a2e"];
+const THIS_YEAR  = new Date().getFullYear();
 
-const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c"];
-
-let state = { programs: [], staff: [], categories: [], confirmations: [] };
+let state = { programs:[], staff:[], categories:[], confirmations:[] };
 let currentProgramId = "";
 let currentStaffId   = "";
 
 window.addEventListener("load", () => {
   if (!SCRIPT_URL) {
-    document.getElementById("configScreen").style.display = "block";
+    // Prompt for URL inline
+    document.getElementById("loadingState").innerHTML = `
+      <div style="max-width:440px;margin:0 auto">
+        <div class="alert alert-info">Please enter the Apps Script URL provided by your program administrator.</div>
+        <input type="url" id="inlineUrl" class="form-control" placeholder="https://script.google.com/macros/s/..." style="margin-bottom:10px"/>
+        <button class="btn btn-primary btn-block" onclick="saveInlineUrl()">Connect</button>
+      </div>`;
   } else {
-    document.getElementById("mainApp").style.display = "block";
     loadData();
   }
 });
 
-function saveConfig() {
-  const url = document.getElementById("configUrl").value.trim();
-  if (!url.startsWith("https://script.google.com")) {
-    alert("Please enter a valid Apps Script URL.");
-    return;
-  }
+function saveInlineUrl() {
+  const url = document.getElementById("inlineUrl").value.trim();
+  if (!url.startsWith("https://script.google.com")) { alert("Please enter a valid Apps Script URL."); return; }
   localStorage.setItem(CONFIG_KEY, url);
   SCRIPT_URL = url;
-  document.getElementById("configScreen").style.display = "none";
-  document.getElementById("mainApp").style.display = "block";
   loadData();
-}
-
-async function api(action, body = null) {
-  if (body) {
-    const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action, ...body }) });
-    return res.json();
-  } else {
-    const res = await fetch(`${SCRIPT_URL}?action=${action}`);
-    return res.json();
-  }
 }
 
 async function loadData() {
   show("loadingState");
   try {
-    const data = await api("getBootstrap");
-    if (data.success) {
-      state = data;
-      initUI();
-    } else {
-      document.getElementById("loadingState").innerHTML =
-        `<div class="alert alert-error">Could not load data: ${data.error}</div>`;
-    }
-  } catch (e) {
-    document.getElementById("loadingState").innerHTML =
-      `<div class="alert alert-error">Connection error. Check your setup.</div>`;
+    const r = await fetch(`${SCRIPT_URL}?action=getConfirmBootstrap`);
+    const data = await r.json();
+    if (data.success) { state = data; initUI(); }
+    else { document.getElementById("loadingState").innerHTML=`<div class="alert alert-error">Could not load: ${data.error}</div>`; }
+  } catch(e) {
+    document.getElementById("loadingState").innerHTML=`<div class="alert alert-error">Connection error.</div>`;
   }
 }
 
 function initUI() {
-  const activePrograms = state.programs.filter(p => p.Active === "Yes");
-  const sel = document.getElementById("confProgram");
-  sel.innerHTML = activePrograms.map(p =>
-    `<option value="${p.ProgramID}">${p.ProgramName}</option>`
-  ).join("");
+  const progs = state.programs.filter(p=>p.Active==="Yes");
+  const sel   = document.getElementById("confProgram");
+  sel.innerHTML = progs.map(p=>`<option value="${p.ProgramID}">${p.ProgramName}</option>`).join("");
   onProgramChange();
+  document.getElementById("saveYear").textContent = THIS_YEAR;
   show("step1");
 }
 
 function onProgramChange() {
-  const programId = document.getElementById("confProgram").value;
-  const staff = state.staff.filter(s => s.ProgramID === programId && s.Active === "Yes");
-  const sel = document.getElementById("confStaff");
-  sel.innerHTML = staff.map(s =>
-    `<option value="${s.StaffID}">${s.FullName}</option>`
-  ).join("");
+  const pid   = document.getElementById("confProgram").value;
+  const staff = state.staff.filter(s=>s.ProgramID===pid && s.Active==="Yes");
+  document.getElementById("confStaff").innerHTML = staff.map(s=>`<option value="${s.StaffID}">${s.FullName}</option>`).join("");
 }
 
 function loadCategories() {
   currentProgramId = document.getElementById("confProgram").value;
   currentStaffId   = document.getElementById("confStaff").value;
-  const staffObj   = state.staff.find(s => s.StaffID === currentStaffId);
+  const staffObj   = state.staff.find(s=>s.StaffID===currentStaffId);
   if (!staffObj) return;
-
   document.getElementById("staffLabel").textContent = staffObj.FullName + " · " + staffObj.Role;
+
+  // Show S.A.V.E. notice if this program type has annual categories
+  const cats = getCategories();
+  const hasAnnual = cats.some(c=>c.AnnualRenewal==="Yes");
+  document.getElementById("saveNotice").style.display = hasAnnual ? "block" : "none";
+
   renderCategories();
   show("step2");
 }
 
+function getCategories() {
+  const prog = state.programs.find(p=>p.ProgramID===currentProgramId);
+  if (!prog) return [];
+  return state.categories
+    .filter(c=>c.ProgramTypeID===prog.ProgramTypeID)
+    .sort((a,b)=>a.CategoryOrder-b.CategoryOrder);
+}
+
+function hasConfirmed(staffId, categoryId, year=null) {
+  return state.confirmations.some(c=>{
+    const match = c.StaffID===staffId && c.CategoryID===categoryId;
+    if (!year) return match;
+    return match && String(c.RenewalYear)===String(year);
+  });
+}
+
 function renderCategories() {
-  const cats = state.categories
-    .filter(c => {
-      const prog = state.programs.find(p => p.ProgramID === currentProgramId);
-      return prog && c.ProgramTypeID === prog.ProgramTypeID;
-    })
-    .sort((a, b) => a.CategoryOrder - b.CategoryOrder);
+  const cats = getCategories();
+  const allDone = cats.every(c => {
+    return c.AnnualRenewal==="Yes"
+      ? hasConfirmed(currentStaffId, c.CategoryID, THIS_YEAR)
+      : hasConfirmed(currentStaffId, c.CategoryID);
+  });
 
-  const allDone = cats.every(c => hasConfirmed(currentStaffId, c.CategoryID));
-  if (allDone && cats.length > 0) {
-    show("doneScreen");
-    return;
-  }
+  if (allDone && cats.length>0) { show("doneScreen"); return; }
 
-  document.getElementById("catList").innerHTML = cats.map((c, i) => {
-    const done = hasConfirmed(currentStaffId, c.CategoryID);
-    const modules = (c.Modules || "").split("|").map(m => m.trim()).filter(Boolean);
-    const confirmedAt = state.confirmations.find(
-      cf => cf.StaffID === currentStaffId && cf.CategoryID === c.CategoryID
-    )?.ConfirmedAt;
+  document.getElementById("catList").innerHTML = cats.map((c,i)=>{
+    const isAnnual = c.AnnualRenewal==="Yes";
+    const done     = isAnnual
+      ? hasConfirmed(currentStaffId, c.CategoryID, THIS_YEAR)
+      : hasConfirmed(currentStaffId, c.CategoryID);
+    const conf     = state.confirmations.find(cf=>cf.StaffID===currentStaffId && cf.CategoryID===c.CategoryID && (!isAnnual || String(cf.RenewalYear)===String(THIS_YEAR)));
+    const modules  = (c.Modules||"").split("|").map(m=>m.trim()).filter(Boolean);
 
     return `
       <div class="cat-card">
-        <div class="cat-card-header" style="background:${CAT_COLORS[i % CAT_COLORS.length]}">
+        <div class="cat-card-header" style="background:${CAT_COLORS[i%CAT_COLORS.length]}">
           <span>${c.CategoryName}</span>
-          ${done ? '<span class="badge badge-done">Confirmed ✓</span>' : ''}
+          <div style="display:flex;gap:6px;align-items:center">
+            ${isAnnual?`<span class="badge badge-save">Annual ${THIS_YEAR}</span>`:""}
+            ${done?`<span class="badge badge-done">Confirmed ✓</span>`:""}
+          </div>
         </div>
         <div class="cat-card-body">
-          <div style="margin-bottom:10px;">
-            ${modules.map(m => `
+          ${isAnnual?`<div class="alert alert-save" style="margin-bottom:10px;font-size:.76rem">⚠️ This category includes <strong>S.A.V.E. Suicide Prevention Training</strong> which is required annually by the VA. Your confirmation will be recorded for <strong>${THIS_YEAR}</strong>.</div>`:""}
+          <div style="margin-bottom:12px">
+            ${modules.map(m=>`
               <div class="module-item">
-                <div class="module-bullet"></div>
-                <span>${m}</span>
+                <div class="module-bullet" style="background:${m.includes('S.A.V.E.')?'var(--save)':'var(--muted)'}"></div>
+                <span style="color:${m.includes('S.A.V.E.')?'var(--save)':'#374151'};font-weight:${m.includes('S.A.V.E.')?700:400}">${m}</span>
               </div>`).join("")}
           </div>
           ${done
-            ? `<p style="color:#065f46;font-size:0.78rem;font-weight:700;">
-                ✓ Confirmed on ${fmtDate(confirmedAt)}
-               </p>`
+            ? `<p style="color:#065f46;font-size:.78rem;font-weight:700">✓ Confirmed on ${fmtDate(conf?.ConfirmedAt)}${isAnnual?" for "+THIS_YEAR:""}</p>`
             : `<div class="attest-box">
-                By confirming, you attest that you have received and understood
-                all training covered in this category.
+                <strong>Electronic Attestation</strong><br/><br/>
+                I attest that I have personally completed the training identified above in its entirety.
+                I understand that this acknowledgement is recorded electronically with my authenticated
+                user credentials and may be relied upon for compliance, audit, and employment-related
+                purposes. I acknowledge that providing false information may result in disciplinary action.
                </div>
-               <button class="btn btn-gold"
-                 onclick="confirmCategory('${c.CategoryID}','${c.CategoryName}',${i})">
+               <button class="btn btn-gold" onclick="confirmCategory('${c.CategoryID}','${c.CategoryName}','${isAnnual}')">
                  Confirm Category Completion
                </button>`
           }
@@ -405,45 +268,51 @@ function renderCategories() {
   }).join("");
 }
 
-async function confirmCategory(categoryId, categoryName, idx) {
-  const staffObj = state.staff.find(s => s.StaffID === currentStaffId);
-  if (!confirm(`Confirm you have completed training in:\n"${categoryName}"?\n\nThis will be recorded with a timestamp.`)) return;
+async function confirmCategory(categoryId, categoryName, annualRenewal) {
+  const staffObj = state.staff.find(s=>s.StaffID===currentStaffId);
+  const isAnnual = annualRenewal==="true";
+  const confirmMsg = isAnnual
+    ? `Confirm completion of "${categoryName}" for ${THIS_YEAR}?\n\nThis includes S.A.V.E. Annual Renewal and will be recorded with a timestamp.`
+    : `Confirm completion of "${categoryName}"?\n\nBy confirming you attest that you have personally completed all training in this category. This is recorded electronically.`;
 
-  const res = await api("confirmCategory", {
-    staffId:      currentStaffId,
-    staffName:    staffObj.FullName,
-    programId:    currentProgramId,
-    categoryId,
-    categoryName
+  if (!confirm(confirmMsg)) return;
+
+  const res = await fetch(SCRIPT_URL, {
+    method:"POST",
+    body: JSON.stringify({
+      action:"confirmCategory",
+      staffId:currentStaffId,
+      staffName:staffObj.FullName,
+      programId:currentProgramId,
+      categoryId,
+      categoryName,
+      annualRenewal: isAnnual?"Yes":"No"
+    })
   });
+  const data = await res.json();
 
-  if (res.success) {
-    const data = await api("getBootstrap");
-    if (data.success) { state = data; }
+  if (data.success) {
+    const r = await fetch(`${SCRIPT_URL}?action=getConfirmBootstrap`);
+    const d = await r.json();
+    if (d.success) state=d;
     renderCategories();
   } else {
-    alert("Error saving: " + res.error);
+    alert("Error saving: "+data.error);
   }
 }
 
-function goBack() {
-  show("step1");
-}
-
-function hasConfirmed(staffId, categoryId) {
-  return state.confirmations.some(c => c.StaffID === staffId && c.CategoryID === categoryId);
-}
+function goBack() { show("step1"); }
 
 function fmtDate(iso) {
   if (!iso) return "";
   const d = new Date(iso);
-  return isNaN(d) ? iso : d.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
+  return isNaN(d)?iso:d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
 }
 
 function show(id) {
-  ["loadingState","step1","step2","doneScreen"].forEach(s => {
-    const el = document.getElementById(s);
-    if (el) el.style.display = s === id ? "block" : "none";
+  ["loadingState","step1","step2","doneScreen"].forEach(s=>{
+    const el=document.getElementById(s);
+    if(el) el.style.display=s===id?"block":"none";
   });
 }
 </script>

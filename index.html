@@ -1,357 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>VMC Training Tracker</title>
 <style>
-  /* ── Reset & Base ─────────────────────────────────────────── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --navy:   #0d2137;
-    --blue:   #1a3a5c;
-    --green:  #1e5c3a;
-    --gold:   #c9a84c;
-    --light:  #f8f7f4;
-    --white:  #ffffff;
-    --border: #e5e7eb;
-    --text:   #1a1a1a;
-    --muted:  #6b7280;
-    --red:    #dc2626;
-    --amber:  #f59e0b;
-    --emerald:#10b981;
-  }
-
-  body {
-    font-family: 'Georgia', 'Times New Roman', serif;
-    background: var(--light);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ── Header ───────────────────────────────────────────────── */
-  .header {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 60%, var(--green) 100%);
-    padding: 20px 24px 16px;
-    border-bottom: 3px solid var(--gold);
-  }
-  .header-top { display: flex; align-items: center; gap: 14px; }
-  .header-icon {
-    background: var(--gold);
-    border-radius: 8px;
-    width: 44px; height: 44px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; flex-shrink: 0;
-  }
-  .header-title { color: #fff; font-size: 1.25rem; font-weight: 700; line-height: 1.2; }
-  .header-sub { color: #93b4d0; font-size: 0.75rem; margin-top: 3px; }
-  .header-tag {
-    color: var(--gold); font-size: 0.65rem;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px;
-  }
-
-  /* ── Nav tabs ─────────────────────────────────────────────── */
-  .nav {
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    display: flex; overflow-x: auto;
-    padding: 0 16px;
-  }
-  .nav-btn {
-    background: none; border: none;
-    border-bottom: 3px solid transparent;
-    padding: 14px 16px; cursor: pointer;
-    font-family: inherit; font-size: 0.8rem;
-    font-weight: 400; color: var(--muted);
-    white-space: nowrap; transition: all 0.15s;
-  }
-  .nav-btn.active {
-    border-bottom-color: var(--navy);
-    color: var(--navy); font-weight: 700;
-  }
-
-  /* ── Layout ───────────────────────────────────────────────── */
-  .page { display: none; padding: 20px 16px; max-width: 900px; margin: 0 auto; }
-  .page.active { display: block; }
-
-  /* ── Cards ────────────────────────────────────────────────── */
-  .card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 10px; overflow: hidden;
-    margin-bottom: 16px;
-  }
-  .card-header {
-    background: var(--navy);
-    color: var(--gold);
-    padding: 10px 16px;
-    font-size: 0.75rem; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .card-body { padding: 16px; }
-
-  /* ── Forms ────────────────────────────────────────────────── */
-  .form-group { margin-bottom: 14px; }
-  .form-label {
-    display: block; font-size: 0.7rem; font-weight: 700;
-    color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.05em; margin-bottom: 5px;
-  }
-  .form-control {
-    width: 100%; border: 1.5px solid var(--border);
-    border-radius: 7px; padding: 9px 12px;
-    font-family: inherit; font-size: 0.85rem;
-    color: var(--text); background: #fafafa;
-    outline: none; transition: border-color 0.15s;
-  }
-  .form-control:focus { border-color: var(--blue); background: var(--white); }
-  select.form-control { cursor: pointer; }
-  textarea.form-control { resize: vertical; min-height: 80px; }
-
-  /* ── Buttons ──────────────────────────────────────────────── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    border: none; border-radius: 7px;
-    padding: 9px 18px; cursor: pointer;
-    font-family: inherit; font-size: 0.82rem; font-weight: 700;
-    transition: opacity 0.15s;
-  }
-  .btn:hover { opacity: 0.88; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-primary { background: var(--navy); color: var(--white); }
-  .btn-gold    { background: var(--gold); color: var(--navy); }
-  .btn-green   { background: var(--green); color: var(--white); }
-  .btn-outline {
-    background: none; color: var(--navy);
-    border: 1.5px solid var(--navy);
-  }
-  .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
-  .btn-block { width: 100%; justify-content: center; }
-
-  /* ── Badges & Pills ───────────────────────────────────────── */
-  .badge {
-    display: inline-block; border-radius: 4px;
-    padding: 2px 8px; font-size: 0.65rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.04em;
-  }
-  .badge-done   { background: #d1fae5; color: #065f46; }
-  .badge-partial{ background: #fef3c7; color: #92400e; }
-  .badge-todo   { background: #f3f4f6; color: var(--muted); }
-
-  /* ── Progress bar ─────────────────────────────────────────── */
-  .progress-wrap {
-    background: #e5e7eb; border-radius: 99px;
-    height: 8px; overflow: hidden; margin-top: 6px;
-  }
-  .progress-bar {
-    height: 100%; border-radius: 99px;
-    background: var(--navy); transition: width 0.4s ease;
-  }
-
-  /* ── Staff grid ───────────────────────────────────────────── */
-  .staff-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 8px; margin-bottom: 14px;
-  }
-  .staff-card {
-    border: 1.5px solid var(--border);
-    border-radius: 8px; padding: 10px 12px;
-    cursor: pointer; transition: all 0.15s;
-    background: var(--white);
-  }
-  .staff-card:hover { border-color: var(--blue); }
-  .staff-card.selected { border-color: var(--navy); background: #eef2ff; }
-  .staff-card-name { font-weight: 700; font-size: 0.82rem; }
-  .staff-card-role { color: var(--muted); font-size: 0.7rem; margin-top: 2px; }
-  .staff-card-pct  {
-    font-size: 0.75rem; font-weight: 700;
-    color: var(--navy); margin-top: 6px;
-  }
-
-  /* ── Category rows ────────────────────────────────────────── */
-  .cat-row {
-    border: 1px solid var(--border);
-    border-radius: 8px; overflow: hidden;
-    margin-bottom: 8px;
-  }
-  .cat-row-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 14px; background: var(--white);
-    cursor: pointer;
-  }
-  .cat-row-header:hover { background: #f9fafb; }
-  .cat-color-bar { width: 4px; height: 20px; border-radius: 2px; flex-shrink: 0; }
-  .cat-name { flex: 1; font-weight: 700; font-size: 0.88rem; }
-  .cat-body {
-    padding: 0 14px 12px;
-    border-top: 1px solid var(--border);
-    background: #fafafa;
-  }
-  .module-list { padding: 10px 0 0; }
-  .module-item {
-    display: flex; align-items: flex-start; gap: 8px;
-    padding: 5px 0; font-size: 0.8rem; color: #374151;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .module-item:last-child { border-bottom: none; }
-  .module-bullet {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--muted); flex-shrink: 0; margin-top: 6px;
-  }
-
-  /* ── Confirm screen ───────────────────────────────────────── */
-  .confirm-hero {
-    text-align: center; padding: 32px 20px;
-  }
-  .confirm-icon { font-size: 3rem; margin-bottom: 12px; }
-  .confirm-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
-  .confirm-sub { color: var(--muted); font-size: 0.85rem; line-height: 1.6; }
-
-  /* ── Dashboard stats ──────────────────────────────────────── */
-  .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px; margin-bottom: 16px;
-  }
-  .stat-box {
-    background: var(--white); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px;
-    text-align: center;
-  }
-  .stat-val { font-size: 1.4rem; font-weight: 700; color: var(--navy); }
-  .stat-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
-
-  /* ── Alert ────────────────────────────────────────────────── */
-  .alert {
-    border-radius: 8px; padding: 10px 14px;
-    font-size: 0.8rem; margin-bottom: 14px;
-    border-left: 4px solid;
-  }
-  .alert-info    { background: #eff6ff; border-color: #3b82f6; color: #1e40af; }
-  .alert-warning { background: #fffbeb; border-color: var(--gold); color: #78350f; }
-  .alert-success { background: #d1fae5; border-color: var(--emerald); color: #065f46; }
-  .alert-error   { background: #fee2e2; border-color: var(--red); color: #991b1b; }
-
-  /* ── Loading ──────────────────────────────────────────────── */
-  .loading {
-    text-align: center; padding: 40px;
-    color: var(--muted); font-size: 0.9rem;
-  }
-  .spinner {
-    display: inline-block; width: 28px; height: 28px;
-    border: 3px solid var(--border);
-    border-top-color: var(--navy);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-bottom: 10px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── Table ────────────────────────────────────────────────── */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-  th {
-    background: #f3f4f6; text-align: left;
-    padding: 8px 10px; font-weight: 700;
-    color: var(--muted); border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  td { padding: 8px 10px; border-bottom: 1px solid #f3f4f6; color: #374151; }
-  tr:last-child td { border-bottom: none; }
-
-  /* ── Checkbox list ────────────────────────────────────────── */
-  .check-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 0; cursor: pointer;
-  }
-  .check-item input[type=checkbox] {
-    width: 16px; height: 16px; cursor: pointer; accent-color: var(--navy);
-  }
-
-  /* ── Config screen ────────────────────────────────────────── */
-  .config-banner {
-    background: var(--navy); color: var(--white);
-    border-radius: 10px; padding: 20px;
-    text-align: center; margin-bottom: 20px;
-  }
-  .config-banner h2 { color: var(--gold); margin-bottom: 8px; }
-  .config-banner p  { font-size: 0.82rem; color: #93b4d0; line-height: 1.6; }
-
-  /* ── Responsive tweaks ────────────────────────────────────── */
-  @media (max-width: 480px) {
-    .header { padding: 14px; }
-    .page { padding: 14px 10px; }
-    .stat-grid { grid-template-columns: repeat(2, 1fr); }
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0d2137;--blue:#1a3a5c;--green:#1e5c3a;--gold:#c9a84c;
+  --light:#f8f7f4;--white:#fff;--border:#e5e7eb;--text:#1a1a1a;
+  --muted:#6b7280;--red:#dc2626;--amber:#f59e0b;--emerald:#10b981;
+  --save:#7c3aed;
+}
+body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color:var(--text);min-height:100vh}
+.header{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,var(--green) 100%);padding:20px 24px 16px;border-bottom:3px solid var(--gold)}
+.header-top{display:flex;align-items:center;gap:14px}
+.header-icon{background:var(--gold);border-radius:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.header-title{color:#fff;font-size:1.25rem;font-weight:700;line-height:1.2}
+.header-sub{color:#93b4d0;font-size:0.75rem;margin-top:3px}
+.header-tag{color:var(--gold);font-size:0.65rem;font-family:'Courier New',monospace;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.header-meta{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap}
+.header-meta-item .val{color:var(--gold);font-size:1.1rem;font-weight:700}
+.header-meta-item .lbl{color:#93b4d0;font-size:.65rem;text-transform:uppercase;letter-spacing:.05em}
+.role-badge{display:inline-block;background:var(--gold);color:var(--navy);border-radius:4px;padding:2px 10px;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-left:8px}
+.nav{background:var(--white);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 16px}
+.nav-btn{background:none;border:none;border-bottom:3px solid transparent;padding:14px 16px;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:400;color:var(--muted);white-space:nowrap;transition:all .15s}
+.nav-btn.active{border-bottom-color:var(--navy);color:var(--navy);font-weight:700}
+.page{display:none;padding:20px 16px;max-width:960px;margin:0 auto}
+.page.active{display:block}
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.card-header{background:var(--navy);color:var(--gold);padding:10px 16px;font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:16px}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.form-control{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-family:inherit;font-size:.85rem;color:var(--text);background:#fafafa;outline:none;transition:border-color .15s}
+.form-control:focus{border-color:var(--blue);background:var(--white)}
+select.form-control{cursor:pointer}
+textarea.form-control{resize:vertical;min-height:80px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:7px;padding:9px 18px;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:700;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:var(--navy);color:var(--white)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-green{background:var(--green);color:var(--white)}
+.btn-outline{background:none;color:var(--navy);border:1.5px solid var(--navy)}
+.btn-red{background:var(--red);color:var(--white)}
+.btn-block{width:100%}
+.btn-sm{padding:5px 12px;font-size:.75rem}
+.badge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.badge-done{background:#d1fae5;color:#065f46}
+.badge-partial{background:#fef3c7;color:#92400e}
+.badge-todo{background:#f3f4f6;color:var(--muted)}
+.badge-save{background:#ede9fe;color:#5b21b6}
+.badge-renewal{background:#fce7f3;color:#9d174d}
+.progress-wrap{background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;margin-top:6px}
+.progress-bar{height:100%;border-radius:99px;background:var(--navy);transition:width .4s ease}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.stat-val{font-size:1.3rem;font-weight:700;color:var(--navy)}
+.stat-lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.alert{border-radius:8px;padding:10px 14px;font-size:.8rem;margin-bottom:14px;border-left:4px solid}
+.alert-info{background:#eff6ff;border-color:#3b82f6;color:#1e40af}
+.alert-warning{background:#fffbeb;border-color:var(--gold);color:#78350f}
+.alert-success{background:#d1fae5;border-color:var(--emerald);color:#065f46}
+.alert-error{background:#fee2e2;border-color:var(--red);color:#991b1b}
+.alert-save{background:#ede9fe;border-color:var(--save);color:#5b21b6}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:.9rem}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{background:#f3f4f6;text-align:left;padding:8px 10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid #f3f4f6;color:#374151}
+tr:last-child td{border-bottom:none}
+.check-item{display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer;border-bottom:1px solid #f9fafb}
+.check-item:last-child{border-bottom:none}
+.check-item input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--navy)}
+.staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;margin-bottom:14px}
+.staff-card{border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s;background:var(--white)}
+.staff-card:hover{border-color:var(--blue)}
+.staff-card.selected{border-color:var(--navy);background:#eef2ff}
+.save-flag{background:#ede9fe;border:1px solid #a78bfa;border-radius:6px;padding:8px 12px;font-size:.78rem;color:#5b21b6;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+/* PIN screen */
+.pin-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 60%,var(--green) 100%)}
+.pin-box{background:var(--white);border-radius:16px;padding:32px 28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pin-logo{text-align:center;margin-bottom:24px}
+.pin-logo-icon{background:var(--gold);border-radius:12px;width:56px;height:56px;display:inline-flex;align-items:center;justify-content:center;font-size:1.6rem;margin-bottom:12px}
+.pin-title{font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:4px}
+.pin-sub{color:var(--muted);font-size:.8rem}
+.pin-input{width:100%;border:2px solid var(--border);border-radius:8px;padding:12px 16px;font-size:1rem;font-family:inherit;text-align:center;letter-spacing:.2em;outline:none;transition:border-color .15s;margin-bottom:14px}
+.pin-input:focus{border-color:var(--navy)}
+.pin-error{color:var(--red);font-size:.8rem;text-align:center;margin-bottom:10px;min-height:20px}
+@media(max-width:480px){.header{padding:14px}.page{padding:14px 10px}.stat-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 
-<!-- ── CONFIG SCREEN (shown until Apps Script URL is set) ──── -->
-<div id="configScreen" style="display:none; padding:24px; max-width:600px; margin:0 auto;">
-  <div class="config-banner">
-    <div style="font-size:2rem; margin-bottom:8px;">⚙️</div>
-    <h2>First-Time Setup</h2>
-    <p>Paste your Google Apps Script Web App URL below to connect this tracker to your Google Sheet. You only need to do this once.</p>
+<!-- PIN Screen -->
+<div id="pinScreen" class="pin-screen">
+  <div class="pin-box">
+    <div class="pin-logo">
+      <div class="pin-logo-icon">⭐</div>
+      <div class="pin-title">VMC Training Tracker</div>
+      <div class="pin-sub">Enter your access PIN to continue</div>
+    </div>
+    <input type="password" id="pinInput" class="pin-input" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')submitPin()" maxlength="12"/>
+    <div id="pinError" class="pin-error"></div>
+    <button class="btn btn-primary btn-block" onclick="submitPin()">Access Tracker</button>
+    <div style="text-align:center;margin-top:16px;font-size:.72rem;color:var(--muted)">
+      Contact your program administrator if you need your PIN.
+    </div>
+  </div>
+</div>
+
+<!-- Config screen (first time setup) -->
+<div id="configScreen" style="display:none;padding:24px;max-width:560px;margin:0 auto">
+  <div style="background:var(--navy);color:var(--white);border-radius:10px;padding:20px;text-align:center;margin-bottom:20px">
+    <div style="font-size:2rem;margin-bottom:8px">⚙️</div>
+    <h2 style="color:var(--gold);margin-bottom:8px">First-Time Setup</h2>
+    <p style="font-size:.82rem;color:#93b4d0;line-height:1.6">Paste your Google Apps Script Web App URL to connect this tracker to your Google Sheet.</p>
   </div>
   <div class="card">
     <div class="card-header">Apps Script Web App URL</div>
     <div class="card-body">
       <div class="form-group">
         <label class="form-label">Web App URL</label>
-        <input type="url" id="configUrl" class="form-control"
-          placeholder="https://script.google.com/macros/s/..." />
+        <input type="url" id="configUrl" class="form-control" placeholder="https://script.google.com/macros/s/..."/>
       </div>
-      <div class="alert alert-info">
-        In Google Apps Script: click <strong>Deploy &gt; New deployment &gt; Web app</strong>.
-        Set Execute as: <strong>Me</strong>, Who has access: <strong>Anyone</strong>.
-        Copy the URL and paste it above.
-      </div>
-      <button class="btn btn-primary btn-block" onclick="saveConfig()">Connect &amp; Load</button>
+      <div class="alert alert-info">In Apps Script: Deploy → New deployment → Web app. Execute as: Me. Who has access: Anyone.</div>
+      <button class="btn btn-primary btn-block" onclick="saveConfig()">Connect & Continue</button>
     </div>
   </div>
 </div>
 
-<!-- ── MAIN APP ─────────────────────────────────────────────── -->
-<div id="mainApp" style="display:none;">
-
-  <!-- Header -->
+<!-- Main App -->
+<div id="mainApp" style="display:none">
   <div class="header">
     <div class="header-top">
       <div class="header-icon">⭐</div>
       <div>
-        <div class="header-tag">VMC · DOL/VETS · VPL 06-24</div>
-        <div class="header-title">Staff Training Tracker</div>
-        <div class="header-sub">Homeless Veterans' Reintegration Program</div>
+        <div class="header-tag">VMC · DOL/VETS · VA/HUD</div>
+        <div class="header-title">Staff Training Tracker <span id="roleBadge" class="role-badge"></span></div>
+        <div class="header-sub">Veterans Multi-Service Center · Program Training Management</div>
       </div>
     </div>
+    <div class="header-meta" id="headerMeta"></div>
   </div>
 
-  <!-- Nav -->
   <nav class="nav">
-    <button class="nav-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
-    <button class="nav-btn" onclick="showTab('logSession')">📋 Log Training</button>
-    <button class="nav-btn" onclick="showTab('confirm')">✅ Staff Confirm</button>
-    <button class="nav-btn" onclick="showTab('history')">📁 History</button>
-    <button class="nav-btn" onclick="showTab('manage')">⚙️ Manage</button>
+    <button class="nav-btn active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+    <button class="nav-btn" onclick="showTab('logSession',this)">📋 Log Training</button>
+    <button class="nav-btn" onclick="showTab('history',this)">📁 History</button>
+    <button class="nav-btn" onclick="showTab('manage',this)" id="manageTab">⚙️ Manage</button>
   </nav>
 
-  <!-- Loading -->
-  <div id="loadingState" class="loading">
-    <div class="spinner"></div><br/>Loading data...
-  </div>
+  <div id="loadingState" class="loading"><div class="spinner"></div><br/>Loading data...</div>
 
-  <!-- ── DASHBOARD ──────────────────────────────────────────── -->
+  <!-- DASHBOARD -->
   <div id="page-dashboard" class="page">
-    <div id="programSelector" style="margin-bottom:16px;">
-      <label class="form-label">Program</label>
-      <select id="dashProgram" class="form-control" onchange="renderDashboard()"></select>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:180px">
+        <label class="form-label">Program</label>
+        <select id="dashProgram" class="form-control" onchange="renderDashboard()"></select>
+      </div>
     </div>
     <div id="dashStats" class="stat-grid"></div>
+    <div id="saveAlert"></div>
     <div class="card">
       <div class="card-header">Staff Training Progress</div>
       <div class="card-body" id="dashStaffProgress"></div>
@@ -362,11 +177,9 @@
     </div>
   </div>
 
-  <!-- ── LOG SESSION ────────────────────────────────────────── -->
+  <!-- LOG SESSION -->
   <div id="page-logSession" class="page">
-    <div class="alert alert-info">
-      Log a training session you delivered. Select all staff who attended.
-    </div>
+    <div class="alert alert-info">Log a training session you delivered. Select all staff who attended.</div>
     <div class="card">
       <div class="card-header">Session Details</div>
       <div class="card-body">
@@ -376,11 +189,14 @@
         </div>
         <div class="form-group">
           <label class="form-label">Training Category</label>
-          <select id="logCategory" class="form-control"></select>
+          <select id="logCategory" class="form-control" onchange="renderModuleRef()"></select>
+        </div>
+        <div id="saveWarning" style="display:none" class="alert alert-save">
+          ⚠️ S.A.V.E. is included in this category and is a <strong>VA Required Annual Training</strong>. Make sure to document completion separately for annual renewal tracking.
         </div>
         <div class="form-group">
           <label class="form-label">Session Date</label>
-          <input type="date" id="logDate" class="form-control" />
+          <input type="date" id="logDate" class="form-control"/>
         </div>
         <div class="form-group">
           <label class="form-label">Delivery Method</label>
@@ -390,16 +206,18 @@
             <option>Hybrid</option>
             <option>Self-Study / Async</option>
             <option>NVTAC Webinar</option>
+            <option>VA S.A.V.E. In-Person Training</option>
+            <option>VA Online / TRAIN</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Trainer Name</label>
-          <input type="text" id="logTrainer" class="form-control" placeholder="Your full name" />
+          <input type="text" id="logTrainer" class="form-control" placeholder="Your full name"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Staff Attended (select all that apply)</label>
-          <div id="logAttendees" style="border:1.5px solid var(--border); border-radius:7px; padding:10px; background:#fafafa; max-height:200px; overflow-y:auto;">
-            <span style="color:var(--muted); font-size:0.8rem;">Select a program first</span>
+          <label class="form-label">Staff Attended</label>
+          <div id="logAttendees" style="border:1.5px solid var(--border);border-radius:7px;padding:10px;background:#fafafa;max-height:220px;overflow-y:auto">
+            <span style="color:var(--muted);font-size:.8rem">Select a program first</span>
           </div>
         </div>
         <div class="form-group">
@@ -410,83 +228,57 @@
         <button class="btn btn-primary btn-block" onclick="submitSession()">Log Training Session</button>
       </div>
     </div>
-
-    <!-- Modules reference -->
     <div class="card">
-      <div class="card-header">Category Modules Reference</div>
-      <div class="card-body" id="logModuleRef">
-        <span style="color:var(--muted); font-size:0.82rem;">Select a category to see its modules.</span>
-      </div>
+      <div class="card-header">Modules in Selected Category</div>
+      <div class="card-body" id="logModuleRef"><span style="color:var(--muted);font-size:.82rem">Select a category above.</span></div>
     </div>
   </div>
 
-  <!-- ── STAFF CONFIRM ──────────────────────────────────────── -->
-  <div id="page-confirm" class="page">
-    <div class="alert alert-warning">
-      Staff: select your name and program, then confirm each category you have completed training on.
-    </div>
-
-    <div id="confirmStep1">
-      <div class="card">
-        <div class="card-header">Who Are You?</div>
-        <div class="card-body">
-          <div class="form-group">
-            <label class="form-label">Program</label>
-            <select id="confProgram" class="form-control" onchange="onConfProgramChange()"></select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Your Name</label>
-            <select id="confStaff" class="form-control"></select>
-          </div>
-          <button class="btn btn-primary btn-block" onclick="loadConfirmCategories()">Continue</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="confirmStep2" style="display:none;">
-      <div class="confirm-hero">
-        <div class="confirm-icon">📋</div>
-        <div class="confirm-title" id="confStaffLabel"></div>
-        <div class="confirm-sub">
-          Review each category below. When you have completed all training in a category,
-          tap Confirm. Your confirmation is timestamped and recorded.
-        </div>
-      </div>
-      <div id="confCatList"></div>
-      <button class="btn btn-outline btn-block" onclick="resetConfirmStep()" style="margin-top:8px;">
-        ← Back
-      </button>
-    </div>
-  </div>
-
-  <!-- ── HISTORY ────────────────────────────────────────────── -->
+  <!-- HISTORY -->
   <div id="page-history" class="page">
-    <div class="form-group">
-      <label class="form-label">Filter by Program</label>
-      <select id="histProgram" class="form-control" onchange="renderHistory()"></select>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">
+      <div>
+        <label class="form-label">Program</label>
+        <select id="histProgram" class="form-control" onchange="renderHistory()">
+          <option value="">All Programs</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Staff Member</label>
+        <select id="histStaff" class="form-control" onchange="renderHistory()">
+          <option value="">All Staff</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Category</label>
+        <select id="histCat" class="form-control" onchange="renderHistory()">
+          <option value="">All Categories</option>
+        </select>
+      </div>
     </div>
-
-    <div class="card" style="margin-bottom:16px;">
+    <div class="card" style="margin-bottom:16px">
       <div class="card-header">Training Sessions Logged</div>
       <div class="card-body table-wrap" id="histSessions"></div>
     </div>
-
     <div class="card">
       <div class="card-header">Staff Category Confirmations</div>
       <div class="card-body table-wrap" id="histConfirmations"></div>
     </div>
   </div>
 
-  <!-- ── MANAGE ─────────────────────────────────────────────── -->
+  <!-- MANAGE -->
   <div id="page-manage" class="page">
+    <div id="adminOnlyMsg" style="display:none" class="alert alert-warning">
+      Some features on this page are only available to Admin users.
+    </div>
 
-    <!-- Add Program -->
-    <div class="card">
+    <!-- Add Program (admin only) -->
+    <div id="addProgramCard" class="card">
       <div class="card-header">Add New Program</div>
       <div class="card-body">
         <div class="form-group">
           <label class="form-label">Program Name</label>
-          <input type="text" id="mgmtProgName" class="form-control" placeholder="e.g. Philly HVRP" />
+          <input type="text" id="mgmtProgName" class="form-control" placeholder="e.g. SSVF Allentown"/>
         </div>
         <div class="form-group">
           <label class="form-label">Program Type</label>
@@ -494,7 +286,11 @@
         </div>
         <div class="form-group">
           <label class="form-label">Site / Location</label>
-          <input type="text" id="mgmtSite" class="form-control" placeholder="e.g. Philadelphia, PA" />
+          <input type="text" id="mgmtSite" class="form-control" placeholder="e.g. Allentown, PA"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Organization</label>
+          <input type="text" id="mgmtOrg" class="form-control" placeholder="e.g. CPA, DNJ, VMC"/>
         </div>
         <div id="mgmtProgMsg"></div>
         <button class="btn btn-green" onclick="addProgram()">Add Program</button>
@@ -511,16 +307,21 @@
         </div>
         <div class="form-group">
           <label class="form-label">Full Name</label>
-          <input type="text" id="mgmtStaffName" class="form-control" placeholder="First Last" />
+          <input type="text" id="mgmtStaffName" class="form-control" placeholder="First Last"/>
         </div>
         <div class="form-group">
           <label class="form-label">Role</label>
           <select id="mgmtStaffRole" class="form-control">
-            <option>Case Manager</option>
-            <option>Program Director</option>
             <option>Program Manager</option>
-            <option>Outreach Specialist</option>
+            <option>Program Coordinator</option>
+            <option>Regional Coordinator</option>
+            <option>Housing Coordinator</option>
+            <option>Senior Case Manager</option>
+            <option>Case Manager</option>
+            <option>Health Care Manager</option>
             <option>Employment Specialist</option>
+            <option>Outreach Specialist</option>
+            <option>Job Developer</option>
             <option>Administrative Staff</option>
           </select>
         </div>
@@ -529,13 +330,15 @@
       </div>
     </div>
 
-    <!-- Staff roster -->
+    <!-- Roster -->
     <div class="card">
-      <div class="card-header">Current Staff Roster</div>
+      <div class="card-header">Staff Roster</div>
       <div class="card-body">
         <div class="form-group">
           <label class="form-label">Filter by Program</label>
-          <select id="rosterProgram" class="form-control" onchange="renderRoster()"></select>
+          <select id="rosterProgram" class="form-control" onchange="renderRoster()">
+            <option value="">All Programs</option>
+          </select>
         </div>
         <div id="rosterList"></div>
       </div>
@@ -545,10 +348,8 @@
     <div class="card">
       <div class="card-header">Settings</div>
       <div class="card-body">
-        <button class="btn btn-outline btn-sm" onclick="clearConfig()">Disconnect / Change Apps Script URL</button>
-        <p style="color:var(--muted); font-size:0.75rem; margin-top:8px;">
-          Use this if you need to point the tracker to a different Google Sheet.
-        </p>
+        <button class="btn btn-outline btn-sm" onclick="logout()">🔒 Log Out / Switch PIN</button>
+        <p style="color:var(--muted);font-size:.75rem;margin-top:8px">Returns to the PIN entry screen.</p>
       </div>
     </div>
   </div>
@@ -556,66 +357,75 @@
 </div><!-- /mainApp -->
 
 <script>
-// ── Config ────────────────────────────────────────────────────
 const CONFIG_KEY = "vmc_training_script_url";
-let SCRIPT_URL = localStorage.getItem(CONFIG_KEY) || "";
+const PIN_KEY    = "vmc_training_pin";
+let SCRIPT_URL   = localStorage.getItem(CONFIG_KEY) || "";
+let currentPin   = "";
+let userRole     = "";
+let userSites    = [];
 
-// ── App state ─────────────────────────────────────────────────
-let state = {
-  programs: [], staff: [], categories: [],
-  programTypes: [], sessions: [], confirmations: []
-};
+const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c","#5c1a2e"];
 
-// ── Category colors ───────────────────────────────────────────
-const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c"];
+let state = { programs:[], staff:[], categories:[], programTypes:[], sessions:[], confirmations:[], role:"", sites:[] };
 
 // ── Boot ──────────────────────────────────────────────────────
 window.addEventListener("load", () => {
   if (!SCRIPT_URL) {
-    showConfigScreen();
+    document.getElementById("configScreen").style.display = "block";
   } else {
-    showMainApp();
-    loadData();
+    document.getElementById("pinScreen").style.display = "flex";
   }
 });
 
-function showConfigScreen() {
-  document.getElementById("configScreen").style.display = "block";
-  document.getElementById("mainApp").style.display = "none";
-}
-function showMainApp() {
-  document.getElementById("configScreen").style.display = "none";
-  document.getElementById("mainApp").style.display = "block";
-}
 function saveConfig() {
   const url = document.getElementById("configUrl").value.trim();
-  if (!url.startsWith("https://script.google.com")) {
-    alert("Please enter a valid Apps Script URL.");
-    return;
-  }
+  if (!url.startsWith("https://script.google.com")) { alert("Please enter a valid Apps Script URL."); return; }
   localStorage.setItem(CONFIG_KEY, url);
   SCRIPT_URL = url;
-  showMainApp();
-  loadData();
+  document.getElementById("configScreen").style.display = "none";
+  document.getElementById("pinScreen").style.display = "flex";
 }
-function clearConfig() {
-  if (!confirm("Disconnect from current Google Sheet?")) return;
-  localStorage.removeItem(CONFIG_KEY);
-  SCRIPT_URL = "";
-  location.reload();
+
+async function submitPin() {
+  const pin = document.getElementById("pinInput").value.trim();
+  if (!pin) return;
+  document.getElementById("pinError").textContent = "";
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=validatePin&pin=${encodeURIComponent(pin)}`);
+    const data = await res.json();
+    if (data.success) {
+      currentPin = pin;
+      userRole   = data.role;
+      userSites  = data.sites;
+      document.getElementById("pinScreen").style.display = "none";
+      document.getElementById("mainApp").style.display   = "block";
+      document.getElementById("roleBadge").textContent   = userRole === "Admin" ? "Admin" : "Program Manager";
+      loadData();
+    } else {
+      document.getElementById("pinError").textContent = "Incorrect PIN. Please try again.";
+      document.getElementById("pinInput").value = "";
+    }
+  } catch(e) {
+    document.getElementById("pinError").textContent = "Connection error. Check your setup.";
+  }
+}
+
+function logout() {
+  currentPin = ""; userRole = ""; userSites = [];
+  document.getElementById("pinInput").value = "";
+  document.getElementById("mainApp").style.display = "none";
+  document.getElementById("pinScreen").style.display = "flex";
 }
 
 // ── API ───────────────────────────────────────────────────────
-async function api(action, body = null) {
+async function api(action, body=null) {
   if (body) {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ action, ...body })
-    });
-    return res.json();
+    const r = await fetch(SCRIPT_URL, { method:"POST", body: JSON.stringify({action, pin:currentPin, ...body}) });
+    return r.json();
   } else {
-    const res = await fetch(`${SCRIPT_URL}?action=${action}`);
-    return res.json();
+    const r = await fetch(`${SCRIPT_URL}?action=${action}&pin=${encodeURIComponent(currentPin)}`);
+    return r.json();
   }
 }
 
@@ -627,93 +437,116 @@ async function loadData() {
       state = data;
       initUI();
     } else {
-      showError("Could not load data: " + data.error);
+      document.getElementById("loadingState").innerHTML = `<div class="alert alert-error">${data.error}</div>`;
     }
-  } catch (e) {
-    showError("Connection error. Check your Apps Script URL.");
+  } catch(e) {
+    document.getElementById("loadingState").innerHTML = `<div class="alert alert-error">Connection error.</div>`;
   }
   document.getElementById("loadingState").style.display = "none";
 }
 
-function showError(msg) {
-  document.getElementById("loadingState").innerHTML =
-    `<div class="alert alert-error" style="margin:20px;">${msg}<br><br>
-     <button class="btn btn-outline btn-sm" onclick="showConfigScreen()">Check Settings</button></div>`;
+// ── UI Init ───────────────────────────────────────────────────
+function initUI() {
+  const progs = state.programs.filter(p => p.Active === "Yes");
+
+  populateSelect("dashProgram",      progs, "ProgramID","ProgramName");
+  populateSelect("logProgram",       progs, "ProgramID","ProgramName");
+  populateSelect("mgmtStaffProgram", progs, "ProgramID","ProgramName");
+  populateSelect("mgmtProgType", state.programTypes.filter(t => t.ProgramTypeID !== "HQ"), "ProgramTypeID","ProgramTypeName");
+
+  // History filters
+  populateSelect("histProgram", progs, "ProgramID","ProgramName", true);
+  populateSelect("histCat",
+    [...new Map(state.categories.map(c=>[c.CategoryName,c])).values()],
+    "CategoryName","CategoryName", true);
+
+  document.getElementById("logDate").value = new Date().toISOString().split("T")[0];
+
+  // Admin-only controls
+  if (userRole !== "Admin") {
+    document.getElementById("addProgramCard").style.display = "none";
+  }
+
+  onLogProgramChange();
+  renderDashboard();
+  renderManage();
+  populateRosterPrograms();
+
+  document.getElementById("page-dashboard").classList.add("active");
+
+  // Header stats
+  const totalStaff = state.staff.filter(s => s.Active === "Yes").length;
+  const totalProgs = progs.length;
+  document.getElementById("headerMeta").innerHTML = `
+    <div class="header-meta-item"><div class="val">${totalProgs}</div><div class="lbl">Programs</div></div>
+    <div class="header-meta-item"><div class="val">${totalStaff}</div><div class="lbl">Staff</div></div>
+    <div class="header-meta-item"><div class="val">${userRole === "Admin" ? "All Sites" : totalProgs + " Site" + (totalProgs!==1?"s":"")}</div><div class="lbl">Access</div></div>
+  `;
 }
 
-// ── Tab navigation ────────────────────────────────────────────
-function showTab(name) {
+function showTab(name, btn) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
-  document.getElementById("page-" + name).classList.add("active");
-  event.currentTarget.classList.add("active");
-
-  if (name === "dashboard") renderDashboard();
-  if (name === "history")   renderHistory();
-  if (name === "manage")    renderManage();
+  document.getElementById("page-"+name).classList.add("active");
+  if (btn) btn.classList.add("active");
+  if (name==="history") renderHistory();
+  if (name==="manage")  renderManage();
+  if (name==="dashboard") renderDashboard();
 }
 
 // ── Helpers ───────────────────────────────────────────────────
-function activeStaff(programId) {
-  return state.staff.filter(s => s.ProgramID === programId && s.Active === "Yes");
-}
-function programCategories(programId) {
-  const prog = state.programs.find(p => p.ProgramID === programId);
-  if (!prog) return [];
-  return state.categories
-    .filter(c => c.ProgramTypeID === prog.ProgramTypeID)
-    .sort((a, b) => a.CategoryOrder - b.CategoryOrder);
-}
-function hasConfirmed(staffId, categoryId) {
-  return state.confirmations.some(c => c.StaffID === staffId && c.CategoryID === categoryId);
-}
-function categorySessionCount(programId, categoryId) {
-  return state.sessions.filter(s => s.ProgramID === programId && s.CategoryID === categoryId).length;
-}
-function staffConfirmPct(staffId, programId) {
-  const cats = programCategories(programId);
-  if (!cats.length) return 0;
-  const done = cats.filter(c => hasConfirmed(staffId, c.CategoryID)).length;
-  return Math.round((done / cats.length) * 100);
-}
-function fmtDate(iso) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  return isNaN(d) ? iso : d.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
-}
-function populateSelect(id, items, valKey, labelKey, addAll = false) {
+function populateSelect(id, items, valKey, labelKey, addAll=false) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = "";
-  if (addAll) el.innerHTML = '<option value="">All Programs</option>';
+  if (addAll) el.innerHTML = `<option value="">All</option>`;
   items.forEach(item => {
-    const opt = document.createElement("option");
-    opt.value = item[valKey];
-    opt.textContent = item[labelKey];
-    el.appendChild(opt);
+    const o = document.createElement("option");
+    o.value = item[valKey]; o.textContent = item[labelKey];
+    el.appendChild(o);
   });
 }
 
-// ── Init UI (called after data loads) ────────────────────────
-function initUI() {
-  const activePrograms = state.programs.filter(p => p.Active === "Yes");
+function activeStaff(programId) {
+  return state.staff.filter(s => (!programId || s.ProgramID===programId) && s.Active==="Yes");
+}
 
-  populateSelect("dashProgram",      activePrograms, "ProgramID", "ProgramName");
-  populateSelect("logProgram",       activePrograms, "ProgramID", "ProgramName");
-  populateSelect("confProgram",      activePrograms, "ProgramID", "ProgramName");
-  populateSelect("histProgram",      activePrograms, "ProgramID", "ProgramName", true);
-  populateSelect("rosterProgram",    activePrograms, "ProgramID", "ProgramName", true);
-  populateSelect("mgmtStaffProgram", activePrograms, "ProgramID", "ProgramName");
-  populateSelect("mgmtProgType",     state.programTypes, "ProgramTypeID", "ProgramTypeName");
+function programCategories(programId) {
+  const prog = state.programs.find(p => p.ProgramID===programId);
+  if (!prog) return [];
+  return state.categories.filter(c => c.ProgramTypeID===prog.ProgramTypeID).sort((a,b)=>a.CategoryOrder-b.CategoryOrder);
+}
 
-  // Set today's date
-  document.getElementById("logDate").value = new Date().toISOString().split("T")[0];
+function hasConfirmed(staffId, categoryId, year=null) {
+  return state.confirmations.some(c => {
+    const match = c.StaffID===staffId && c.CategoryID===categoryId;
+    if (!year) return match;
+    return match && c.RenewalYear===String(year);
+  });
+}
 
-  onLogProgramChange();
-  onConfProgramChange();
-  renderDashboard();
+function staffConfirmPct(staffId, programId) {
+  const cats = programCategories(programId);
+  if (!cats.length) return 0;
+  const thisYear = new Date().getFullYear();
+  const done = cats.filter(c => {
+    if (c.AnnualRenewal==="Yes") return hasConfirmed(staffId, c.CategoryID, thisYear);
+    return hasConfirmed(staffId, c.CategoryID);
+  }).length;
+  return Math.round((done/cats.length)*100);
+}
 
-  document.getElementById("page-dashboard").classList.add("active");
+function fmtDate(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d) ? iso : d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+}
+
+function getProgramName(id) {
+  return state.programs.find(p=>p.ProgramID===id)?.ProgramName || id;
+}
+function getCatName(id) {
+  return state.categories.find(c=>c.CategoryID===id)?.CategoryName || id;
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -721,13 +554,25 @@ function renderDashboard() {
   const programId = document.getElementById("dashProgram")?.value;
   if (!programId) return;
 
-  const staff = activeStaff(programId);
-  const cats  = programCategories(programId);
-  const sessions = state.sessions.filter(s => s.ProgramID === programId);
-  const confs    = state.confirmations.filter(c => c.ProgramID === programId);
+  const staff    = activeStaff(programId);
+  const cats     = programCategories(programId);
+  const sessions = state.sessions.filter(s => s.ProgramID===programId);
+  const confs    = state.confirmations.filter(c => c.ProgramID===programId);
+  const thisYear = new Date().getFullYear();
+  const fullyTrained = staff.filter(s => staffConfirmPct(s.StaffID, programId)===100).length;
 
-  // Stats
-  const fullyTrained = staff.filter(s => staffConfirmPct(s.StaffID, programId) === 100).length;
+  // S.A.V.E. alert
+  const saveCat = cats.find(c => c.AnnualRenewal==="Yes");
+  const saveEl  = document.getElementById("saveAlert");
+  if (saveCat) {
+    const needRenewal = staff.filter(s => !hasConfirmed(s.StaffID, saveCat.CategoryID, thisYear));
+    if (needRenewal.length > 0) {
+      saveEl.innerHTML = `<div class="alert alert-save">⚠️ <strong>S.A.V.E. Annual Renewal Due (${thisYear}):</strong> ${needRenewal.map(s=>s.FullName).join(", ")} have not confirmed ${saveCat.CategoryName} for ${thisYear}.</div>`;
+    } else {
+      saveEl.innerHTML = `<div class="alert alert-success">✓ All staff have completed S.A.V.E. renewal for ${thisYear}.</div>`;
+    }
+  } else { saveEl.innerHTML = ""; }
+
   document.getElementById("dashStats").innerHTML = `
     <div class="stat-box"><div class="stat-val">${staff.length}</div><div class="stat-lbl">Staff</div></div>
     <div class="stat-box"><div class="stat-val">${cats.length}</div><div class="stat-lbl">Categories</div></div>
@@ -738,26 +583,26 @@ function renderDashboard() {
 
   // Staff progress
   if (!staff.length) {
-    document.getElementById("dashStaffProgress").innerHTML =
-      '<p style="color:var(--muted);font-size:0.82rem;">No staff added yet. Go to Manage to add staff.</p>';
+    document.getElementById("dashStaffProgress").innerHTML = '<p style="color:var(--muted);font-size:.82rem">No staff added yet. Go to Manage to add staff.</p>';
   } else {
     document.getElementById("dashStaffProgress").innerHTML = staff.map(s => {
       const pct = staffConfirmPct(s.StaffID, programId);
-      const color = pct === 100 ? "var(--emerald)" : pct > 0 ? "var(--navy)" : "var(--border)";
+      const color = pct===100 ? "var(--emerald)" : pct>0 ? "var(--navy)" : "var(--border)";
       return `
-        <div style="margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;flex-wrap:wrap;gap:4px">
             <div>
-              <span style="font-weight:700;font-size:0.85rem;">${s.FullName}</span>
-              <span style="color:var(--muted);font-size:0.72rem;margin-left:6px;">${s.Role}</span>
+              <span style="font-weight:700;font-size:.85rem">${s.FullName}</span>
+              <span style="color:var(--muted);font-size:.72rem;margin-left:6px">${s.Role}</span>
             </div>
-            <span style="font-weight:700;font-size:0.8rem;color:${color}">${pct}%</span>
+            <span style="font-weight:700;font-size:.8rem;color:${color}">${pct}%</span>
           </div>
           <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${color}"></div></div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
             ${cats.map(c => {
-              const done = hasConfirmed(s.StaffID, c.CategoryID);
-              return `<span class="badge ${done ? 'badge-done' : 'badge-todo'}">${c.CategoryName.split(" ")[0]}</span>`;
+              const isAnnual = c.AnnualRenewal==="Yes";
+              const done = isAnnual ? hasConfirmed(s.StaffID,c.CategoryID,thisYear) : hasConfirmed(s.StaffID,c.CategoryID);
+              return `<span class="badge ${done?'badge-done':isAnnual?'badge-renewal':'badge-todo'}" title="${c.CategoryName}${isAnnual?' (Annual)':''}">${c.CategoryName.split(" ")[0]}${isAnnual?' 🔄':''}</span>`;
             }).join("")}
           </div>
         </div>`;
@@ -765,19 +610,20 @@ function renderDashboard() {
   }
 
   // Category coverage
-  document.getElementById("dashCatCoverage").innerHTML = cats.map((c, i) => {
-    const sessionCount = categorySessionCount(programId, c.CategoryID);
-    const confirmedCount = staff.filter(s => hasConfirmed(s.StaffID, c.CategoryID)).length;
-    const pct = staff.length ? Math.round((confirmedCount / staff.length) * 100) : 0;
+  document.getElementById("dashCatCoverage").innerHTML = cats.map((c,i) => {
+    const sessionCount = state.sessions.filter(s=>s.ProgramID===programId && s.CategoryID===c.CategoryID).length;
+    const isAnnual = c.AnnualRenewal==="Yes";
+    const confirmedCount = staff.filter(s => isAnnual ? hasConfirmed(s.StaffID,c.CategoryID,thisYear) : hasConfirmed(s.StaffID,c.CategoryID)).length;
+    const pct = staff.length ? Math.round((confirmedCount/staff.length)*100) : 0;
     return `
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <div style="width:4px;height:36px;background:${CAT_COLORS[i % CAT_COLORS.length]};border-radius:2px;flex-shrink:0;"></div>
-        <div style="flex:1;">
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
-            <span style="font-weight:700;font-size:0.82rem;">${c.CategoryName}</span>
-            <span style="font-size:0.75rem;color:var(--muted);">${confirmedCount}/${staff.length} confirmed &middot; ${sessionCount} session${sessionCount !== 1 ? "s" : ""}</span>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:4px;height:36px;background:${CAT_COLORS[i%CAT_COLORS.length]};border-radius:2px;flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;flex-wrap:wrap;gap:4px">
+            <span style="font-weight:700;font-size:.82rem">${c.CategoryName} ${isAnnual?'<span class="badge badge-save">Annual</span>':''}</span>
+            <span style="font-size:.75rem;color:var(--muted)">${confirmedCount}/${staff.length} confirmed · ${sessionCount} session${sessionCount!==1?"s":""}</span>
           </div>
-          <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${CAT_COLORS[i % CAT_COLORS.length]}"></div></div>
+          <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:${CAT_COLORS[i%CAT_COLORS.length]}"></div></div>
         </div>
       </div>`;
   }).join("");
@@ -788,272 +634,154 @@ function onLogProgramChange() {
   const programId = document.getElementById("logProgram")?.value;
   if (!programId) return;
   const cats = programCategories(programId);
-  populateSelect("logCategory", cats, "CategoryID", "CategoryName");
+  populateSelect("logCategory", cats, "CategoryID","CategoryName");
   renderLogAttendees(programId);
   renderModuleRef();
-  document.getElementById("logCategory").addEventListener("change", renderModuleRef);
 }
 
 function renderLogAttendees(programId) {
   const staff = activeStaff(programId);
-  const wrap = document.getElementById("logAttendees");
-  if (!staff.length) {
-    wrap.innerHTML = '<span style="color:var(--muted);font-size:0.8rem;">No staff in this program. Add staff in Manage.</span>';
-    return;
-  }
-  wrap.innerHTML = staff.map(s => `
+  const wrap  = document.getElementById("logAttendees");
+  if (!staff.length) { wrap.innerHTML='<span style="color:var(--muted);font-size:.8rem">No staff in this program.</span>'; return; }
+  wrap.innerHTML = staff.map(s=>`
     <label class="check-item">
-      <input type="checkbox" value="${s.StaffID}" data-name="${s.FullName}" />
-      <span style="font-size:0.82rem;">${s.FullName} <span style="color:var(--muted)">(${s.Role})</span></span>
+      <input type="checkbox" value="${s.StaffID}" data-name="${s.FullName}"/>
+      <span style="font-size:.82rem">${s.FullName} <span style="color:var(--muted)">(${s.Role})</span></span>
     </label>`).join("");
 }
 
 function renderModuleRef() {
   const catId = document.getElementById("logCategory")?.value;
-  const cat = state.categories.find(c => c.CategoryID === catId);
+  const cat   = state.categories.find(c=>c.CategoryID===catId);
   if (!cat) return;
-  const modules = (cat.Modules || "").split("|").map(m => m.trim()).filter(Boolean);
+  const modules = (cat.Modules||"").split("|").map(m=>m.trim()).filter(Boolean);
+  const isAnnual = cat.AnnualRenewal==="Yes";
+  document.getElementById("saveWarning").style.display = isAnnual ? "block" : "none";
   document.getElementById("logModuleRef").innerHTML = `
-    <div style="font-weight:700;font-size:0.8rem;color:var(--muted);margin-bottom:8px;">
-      MODULES IN THIS CATEGORY
-    </div>
-    ${modules.map(m => `
-      <div class="module-item">
-        <div class="module-bullet"></div>
-        <span>${m}</span>
+    <div style="font-weight:700;font-size:.75rem;color:var(--muted);margin-bottom:8px">MODULES IN THIS CATEGORY</div>
+    ${modules.map(m=>`
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid #f3f4f6;font-size:.8rem">
+        <div style="width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:6px"></div>
+        <span style="color:${m.includes('S.A.V.E.')?'var(--save)':'#374151'};font-weight:${m.includes('S.A.V.E.')?700:400}">${m}</span>
       </div>`).join("")}`;
 }
 
 async function submitSession() {
-  const programId = document.getElementById("logProgram").value;
-  const categoryId = document.getElementById("logCategory").value;
-  const sessionDate = document.getElementById("logDate").value;
-  const deliveryMethod = document.getElementById("logMethod").value;
-  const trainerName = document.getElementById("logTrainer").value.trim();
-  const notes = document.getElementById("logNotes").value.trim();
+  const programId     = document.getElementById("logProgram").value;
+  const categoryId    = document.getElementById("logCategory").value;
+  const sessionDate   = document.getElementById("logDate").value;
+  const deliveryMethod= document.getElementById("logMethod").value;
+  const trainerName   = document.getElementById("logTrainer").value.trim();
+  const notes         = document.getElementById("logNotes").value.trim();
+  const checked       = [...document.querySelectorAll("#logAttendees input:checked")];
+  const attendeeIds   = checked.map(c=>c.value).join(", ");
+  const attendeeNames = checked.map(c=>c.dataset.name).join(", ");
+  const msg           = document.getElementById("logMsg");
 
-  const checked = [...document.querySelectorAll("#logAttendees input:checked")];
-  const attendeeIds   = checked.map(c => c.value).join(", ");
-  const attendeeNames = checked.map(c => c.dataset.name).join(", ");
+  if (!trainerName) { msg.innerHTML='<div class="alert alert-error">Please enter your name.</div>'; return; }
+  if (!sessionDate) { msg.innerHTML='<div class="alert alert-error">Please select a date.</div>'; return; }
+  if (!attendeeIds) { msg.innerHTML='<div class="alert alert-error">Please select at least one staff member.</div>'; return; }
 
-  const msg = document.getElementById("logMsg");
-
-  if (!trainerName)   { msg.innerHTML = '<div class="alert alert-error">Please enter your name.</div>'; return; }
-  if (!sessionDate)   { msg.innerHTML = '<div class="alert alert-error">Please select a date.</div>'; return; }
-  if (!attendeeIds)   { msg.innerHTML = '<div class="alert alert-error">Please select at least one staff member.</div>'; return; }
-
-  msg.innerHTML = '<div class="alert alert-info">Saving...</div>';
-
-  const res = await api("logSession", {
-    programId, categoryId, trainerName, deliveryMethod,
-    sessionDate, attendeeIds, attendeeNames, notes
-  });
-
+  msg.innerHTML='<div class="alert alert-info">Saving...</div>';
+  const res = await api("logSession",{programId,categoryId,trainerName,deliveryMethod,sessionDate,attendeeIds,attendeeNames,notes});
   if (res.success) {
-    msg.innerHTML = '<div class="alert alert-success">Training session logged successfully!</div>';
-    // Reload data to refresh dashboard
-    const data = await api("getBootstrap");
-    if (data.success) { state = data; }
-    // Clear form
-    document.getElementById("logTrainer").value = "";
-    document.getElementById("logNotes").value = "";
-    document.querySelectorAll("#logAttendees input").forEach(i => i.checked = false);
+    msg.innerHTML='<div class="alert alert-success">Session logged successfully!</div>';
+    const d = await api("getBootstrap"); if(d.success) state=d;
+    document.getElementById("logTrainer").value="";
+    document.getElementById("logNotes").value="";
+    document.querySelectorAll("#logAttendees input").forEach(i=>i.checked=false);
   } else {
-    msg.innerHTML = `<div class="alert alert-error">Error: ${res.error}</div>`;
+    msg.innerHTML=`<div class="alert alert-error">Error: ${res.error}</div>`;
   }
-}
-
-// ── STAFF CONFIRM ─────────────────────────────────────────────
-function onConfProgramChange() {
-  const programId = document.getElementById("confProgram")?.value;
-  if (!programId) return;
-  const staff = activeStaff(programId);
-  populateSelect("confStaff", staff, "StaffID", "FullName");
-}
-
-async function loadConfirmCategories() {
-  const programId = document.getElementById("confProgram").value;
-  const staffId   = document.getElementById("confStaff").value;
-  const staffObj  = state.staff.find(s => s.StaffID === staffId);
-  if (!staffObj) return;
-
-  document.getElementById("confStaffLabel").textContent = staffObj.FullName + " · " + staffObj.Role;
-  document.getElementById("confirmStep1").style.display = "none";
-  document.getElementById("confirmStep2").style.display = "block";
-
-  renderConfirmCategories(programId, staffId);
-}
-
-function renderConfirmCategories(programId, staffId) {
-  const cats = programCategories(programId);
-  const wrap = document.getElementById("confCatList");
-
-  wrap.innerHTML = cats.map((c, i) => {
-    const alreadyDone = hasConfirmed(staffId, c.CategoryID);
-    const sessions = state.sessions.filter(s => s.ProgramID === programId && s.CategoryID === c.CategoryID && s.AttendeeIDs.includes(staffId));
-    const modules = (c.Modules || "").split("|").map(m => m.trim()).filter(Boolean);
-
-    return `
-      <div class="card">
-        <div class="card-header" style="background:${CAT_COLORS[i % CAT_COLORS.length]}">
-          ${c.CategoryName}
-          ${alreadyDone ? '<span class="badge badge-done">Confirmed ✓</span>' : ''}
-        </div>
-        <div class="card-body">
-          <div style="font-size:0.72rem;color:var(--muted);margin-bottom:8px;">
-            ${sessions.length} session${sessions.length !== 1 ? "s" : ""} on record for you in this category
-          </div>
-          <div style="font-size:0.78rem;color:#374141;margin-bottom:12px;">
-            ${modules.map(m => `<div style="padding:3px 0;border-bottom:1px solid #f3f4f6;">&#8226; ${m}</div>`).join("")}
-          </div>
-          ${alreadyDone
-            ? `<p style="color:var(--emerald);font-size:0.8rem;font-weight:700;">
-                ✓ You confirmed this category on ${fmtDate(
-                  state.confirmations.find(cf => cf.StaffID === staffId && cf.CategoryID === c.CategoryID)?.ConfirmedAt
-                )}
-               </p>`
-            : `<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:10px;margin-bottom:10px;font-size:0.78rem;color:#78350f;">
-                By confirming, you attest that you have received and understood the training covered in this category.
-               </div>
-               <button class="btn btn-gold btn-block"
-                 onclick="confirmCategory('${programId}','${staffId}','${c.CategoryID}','${c.CategoryName}',${i})">
-                 Confirm Category Completion
-               </button>`
-          }
-        </div>
-      </div>`;
-  }).join("");
-}
-
-async function confirmCategory(programId, staffId, categoryId, categoryName, idx) {
-  const staffObj = state.staff.find(s => s.StaffID === staffId);
-  if (!confirm(`Confirm you have completed training in "${categoryName}"?\n\nThis will be recorded with a timestamp.`)) return;
-
-  const res = await api("confirmCategory", {
-    staffId, staffName: staffObj.FullName,
-    programId, categoryId, categoryName
-  });
-
-  if (res.success) {
-    // Refresh data and re-render
-    const data = await api("getBootstrap");
-    if (data.success) { state = data; }
-    renderConfirmCategories(programId, staffId);
-  } else {
-    alert("Error saving confirmation: " + res.error);
-  }
-}
-
-function resetConfirmStep() {
-  document.getElementById("confirmStep1").style.display = "block";
-  document.getElementById("confirmStep2").style.display = "none";
 }
 
 // ── HISTORY ───────────────────────────────────────────────────
 function renderHistory() {
-  const filterProg = document.getElementById("histProgram")?.value || "";
+  const filterProg  = document.getElementById("histProgram")?.value||"";
+  const filterStaff = document.getElementById("histStaff")?.value||"";
+  const filterCat   = document.getElementById("histCat")?.value||"";
 
-  const sessions = filterProg
-    ? state.sessions.filter(s => s.ProgramID === filterProg)
-    : state.sessions;
+  // Populate staff filter based on program selection
+  const staffForFilter = filterProg ? activeStaff(filterProg) : state.staff.filter(s=>s.Active==="Yes");
+  const staffSel = document.getElementById("histStaff");
+  const currentStaffVal = staffSel.value;
+  staffSel.innerHTML = '<option value="">All Staff</option>';
+  staffForFilter.forEach(s => {
+    const o = document.createElement("option");
+    o.value=s.StaffID; o.textContent=s.FullName;
+    if(s.StaffID===currentStaffVal) o.selected=true;
+    staffSel.appendChild(o);
+  });
 
-  const confs = filterProg
-    ? state.confirmations.filter(c => c.ProgramID === filterProg)
-    : state.confirmations;
+  let sessions = state.sessions;
+  let confs    = state.confirmations;
+  if (filterProg)  { sessions=sessions.filter(s=>s.ProgramID===filterProg); confs=confs.filter(c=>c.ProgramID===filterProg); }
+  if (filterStaff) { sessions=sessions.filter(s=>s.AttendeeIDs.includes(filterStaff)); confs=confs.filter(c=>c.StaffID===filterStaff); }
+  if (filterCat)   { sessions=sessions.filter(s=>getCatName(s.CategoryID)===filterCat); confs=confs.filter(c=>c.CategoryName===filterCat); }
 
-  // Sessions table
-  document.getElementById("histSessions").innerHTML = sessions.length === 0
-    ? '<p style="color:var(--muted);font-size:0.82rem;">No sessions logged yet.</p>'
-    : `<table>
-        <thead><tr>
-          <th>Date</th><th>Program</th><th>Category</th>
-          <th>Trainer</th><th>Method</th><th>Attendees</th><th>Notes</th>
-        </tr></thead>
-        <tbody>${sessions.slice().reverse().map(s => {
-          const prog = state.programs.find(p => p.ProgramID === s.ProgramID);
-          const cat  = state.categories.find(c => c.CategoryID === s.CategoryID);
-          return `<tr>
-            <td>${s.SessionDate}</td>
-            <td>${prog?.ProgramName || s.ProgramID}</td>
-            <td>${cat?.CategoryName || s.CategoryID}</td>
-            <td>${s.TrainerName}</td>
-            <td>${s.DeliveryMethod}</td>
-            <td>${s.AttendeeNames}</td>
-            <td>${s.Notes || ""}</td>
-          </tr>`;
-        }).join("")}</tbody>
-      </table>`;
+  document.getElementById("histSessions").innerHTML = !sessions.length
+    ? '<p style="color:var(--muted);font-size:.82rem">No sessions found.</p>'
+    : `<table><thead><tr><th>Date</th><th>Program</th><th>Category</th><th>Trainer</th><th>Method</th><th>Attendees</th><th>Notes</th></tr></thead>
+       <tbody>${sessions.slice().reverse().map(s=>`<tr>
+         <td>${s.SessionDate}</td><td>${getProgramName(s.ProgramID)}</td>
+         <td>${getCatName(s.CategoryID)}</td><td>${s.TrainerName}</td>
+         <td>${s.DeliveryMethod}</td><td>${s.AttendeeNames}</td><td>${s.Notes||""}</td>
+       </tr>`).join("")}</tbody></table>`;
 
-  // Confirmations table
-  document.getElementById("histConfirmations").innerHTML = confs.length === 0
-    ? '<p style="color:var(--muted);font-size:0.82rem;">No staff confirmations yet.</p>'
-    : `<table>
-        <thead><tr>
-          <th>Date</th><th>Staff Name</th><th>Program</th><th>Category</th>
-        </tr></thead>
-        <tbody>${confs.slice().reverse().map(c => {
-          const prog = state.programs.find(p => p.ProgramID === c.ProgramID);
-          return `<tr>
-            <td>${fmtDate(c.ConfirmedAt)}</td>
-            <td>${c.StaffName}</td>
-            <td>${prog?.ProgramName || c.ProgramID}</td>
-            <td>${c.CategoryName}</td>
-          </tr>`;
-        }).join("")}</tbody>
-      </table>`;
+  document.getElementById("histConfirmations").innerHTML = !confs.length
+    ? '<p style="color:var(--muted);font-size:.82rem">No confirmations found.</p>'
+    : `<table><thead><tr><th>Date</th><th>Staff Name</th><th>Program</th><th>Category</th><th>Annual?</th><th>Year</th></tr></thead>
+       <tbody>${confs.slice().reverse().map(c=>`<tr>
+         <td>${fmtDate(c.ConfirmedAt)}</td><td>${c.StaffName}</td>
+         <td>${getProgramName(c.ProgramID)}</td><td>${c.CategoryName}</td>
+         <td>${c.AnnualRenewal==="Yes"?'<span class="badge badge-save">Annual</span>':''}</td>
+         <td>${c.RenewalYear||""}</td>
+       </tr>`).join("")}</tbody></table>`;
 }
 
 // ── MANAGE ────────────────────────────────────────────────────
+function populateRosterPrograms() {
+  const progs = state.programs.filter(p=>p.Active==="Yes");
+  const sel   = document.getElementById("rosterProgram");
+  sel.innerHTML = '<option value="">All Programs</option>';
+  progs.forEach(p=>{ const o=document.createElement("option"); o.value=p.ProgramID; o.textContent=p.ProgramName; sel.appendChild(o); });
+}
+
 function renderManage() {
-  const activePrograms = state.programs.filter(p => p.Active === "Yes");
-  populateSelect("mgmtStaffProgram", activePrograms, "ProgramID", "ProgramName");
-  populateSelect("rosterProgram",    activePrograms, "ProgramID", "ProgramName", true);
+  const progs = state.programs.filter(p=>p.Active==="Yes");
+  populateSelect("mgmtStaffProgram", progs, "ProgramID","ProgramName");
   renderRoster();
 }
 
 function renderRoster() {
-  const filterProg = document.getElementById("rosterProgram")?.value || "";
-  const staff = filterProg
-    ? state.staff.filter(s => s.ProgramID === filterProg && s.Active === "Yes")
-    : state.staff.filter(s => s.Active === "Yes");
-
-  document.getElementById("rosterList").innerHTML = staff.length === 0
-    ? '<p style="color:var(--muted);font-size:0.82rem;">No staff found.</p>'
-    : `<table>
-        <thead><tr><th>Name</th><th>Role</th><th>Program</th><th>Added</th></tr></thead>
-        <tbody>${staff.map(s => {
-          const prog = state.programs.find(p => p.ProgramID === s.ProgramID);
-          return `<tr>
-            <td>${s.FullName}</td>
-            <td>${s.Role}</td>
-            <td>${prog?.ProgramName || s.ProgramID}</td>
-            <td>${fmtDate(s.AddedDate)}</td>
-          </tr>`;
-        }).join("")}</tbody>
-      </table>`;
+  const filterProg = document.getElementById("rosterProgram")?.value||"";
+  const staff = state.staff.filter(s=>s.Active==="Yes" && (!filterProg||s.ProgramID===filterProg));
+  document.getElementById("rosterList").innerHTML = !staff.length
+    ? '<p style="color:var(--muted);font-size:.82rem">No staff found.</p>'
+    : `<table><thead><tr><th>Name</th><th>Role</th><th>Program</th><th>Added</th></tr></thead>
+       <tbody>${staff.map(s=>`<tr>
+         <td>${s.FullName}</td><td>${s.Role}</td>
+         <td>${getProgramName(s.ProgramID)}</td><td>${fmtDate(s.AddedDate)}</td>
+       </tr>`).join("")}</tbody></table>`;
 }
 
 async function addProgram() {
+  if (userRole!=="Admin") { alert("Admin access required."); return; }
   const programName  = document.getElementById("mgmtProgName").value.trim();
-  const programTypeId = document.getElementById("mgmtProgType").value;
+  const programTypeId= document.getElementById("mgmtProgType").value;
   const site         = document.getElementById("mgmtSite").value.trim();
+  const organization = document.getElementById("mgmtOrg").value.trim();
   const msg          = document.getElementById("mgmtProgMsg");
-  if (!programName || !site) { msg.innerHTML = '<div class="alert alert-error">Please fill in all fields.</div>'; return; }
-
-  msg.innerHTML = '<div class="alert alert-info">Saving...</div>';
-  const res = await api("addProgram", { programName, programTypeId, site });
+  if (!programName||!site||!organization) { msg.innerHTML='<div class="alert alert-error">Please fill in all fields.</div>'; return; }
+  msg.innerHTML='<div class="alert alert-info">Saving...</div>';
+  const res = await api("addProgram",{programName,programTypeId,site,organization});
   if (res.success) {
-    msg.innerHTML = '<div class="alert alert-success">Program added!</div>';
-    const data = await api("getBootstrap");
-    if (data.success) {
-      state = data;
-      initUI();
-    }
-    document.getElementById("mgmtProgName").value = "";
-    document.getElementById("mgmtSite").value = "";
-  } else {
-    msg.innerHTML = `<div class="alert alert-error">Error: ${res.error}</div>`;
-  }
+    msg.innerHTML='<div class="alert alert-success">Program added!</div>';
+    const d=await api("getBootstrap"); if(d.success){state=d;initUI();}
+    document.getElementById("mgmtProgName").value="";
+    document.getElementById("mgmtSite").value="";
+    document.getElementById("mgmtOrg").value="";
+  } else { msg.innerHTML=`<div class="alert alert-error">Error: ${res.error}</div>`; }
 }
 
 async function addStaff() {
@@ -1061,22 +789,14 @@ async function addStaff() {
   const fullName  = document.getElementById("mgmtStaffName").value.trim();
   const role      = document.getElementById("mgmtStaffRole").value;
   const msg       = document.getElementById("mgmtStaffMsg");
-  if (!fullName) { msg.innerHTML = '<div class="alert alert-error">Please enter a name.</div>'; return; }
-
-  msg.innerHTML = '<div class="alert alert-info">Saving...</div>';
-  const res = await api("addStaff", { programId, fullName, role });
+  if (!fullName) { msg.innerHTML='<div class="alert alert-error">Please enter a name.</div>'; return; }
+  msg.innerHTML='<div class="alert alert-info">Saving...</div>';
+  const res = await api("addStaff",{programId,fullName,role});
   if (res.success) {
-    msg.innerHTML = '<div class="alert alert-success">Staff member added!</div>';
-    const data = await api("getBootstrap");
-    if (data.success) {
-      state = data;
-      initUI();
-      renderManage();
-    }
-    document.getElementById("mgmtStaffName").value = "";
-  } else {
-    msg.innerHTML = `<div class="alert alert-error">Error: ${res.error}</div>`;
-  }
+    msg.innerHTML='<div class="alert alert-success">Staff member added!</div>';
+    const d=await api("getBootstrap"); if(d.success){state=d;initUI();renderManage();populateRosterPrograms();}
+    document.getElementById("mgmtStaffName").value="";
+  } else { msg.innerHTML=`<div class="alert alert-error">Error: ${res.error}</div>`; }
 }
 </script>
 </body>
