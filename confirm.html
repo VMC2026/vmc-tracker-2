@@ -129,7 +129,7 @@ let SCRIPT_URL   = localStorage.getItem(CONFIG_KEY) || "";
 const CAT_COLORS = ["#1a3a5c","#1e5c3a","#5c3a1a","#3a1a5c","#1a4f5c","#5c1a2e"];
 const THIS_YEAR  = new Date().getFullYear();
 
-let state = { programs:[], staff:[], categories:[], confirmations:[] };
+let state = { programs:[], staff:[], categories:[], confirmations:[], sessions:[] };
 let currentProgramId = "";
 let currentStaffId   = "";
 
@@ -214,6 +214,14 @@ function hasConfirmed(staffId, categoryId, year=null) {
   });
 }
 
+function hasSession(staffId, programId, categoryId) {
+  return state.sessions.some(s =>
+    s.ProgramID === programId &&
+    s.CategoryID === categoryId &&
+    s.AttendeeIDs && s.AttendeeIDs.includes(staffId)
+  );
+}
+
 function renderCategories() {
   const cats = getCategories();
   const allDone = cats.every(c => {
@@ -225,24 +233,48 @@ function renderCategories() {
   if (allDone && cats.length>0) { show("doneScreen"); return; }
 
   document.getElementById("catList").innerHTML = cats.map((c,i)=>{
-    const isAnnual = c.AnnualRenewal==="Yes";
-    const done     = isAnnual
+    const isAnnual    = c.AnnualRenewal==="Yes";
+    const done        = isAnnual
       ? hasConfirmed(currentStaffId, c.CategoryID, THIS_YEAR)
       : hasConfirmed(currentStaffId, c.CategoryID);
-    const conf     = state.confirmations.find(cf=>cf.StaffID===currentStaffId && cf.CategoryID===c.CategoryID && (!isAnnual || String(cf.RenewalYear)===String(THIS_YEAR)));
-    const modules  = (c.Modules||"").split("|").map(m=>m.trim()).filter(Boolean);
+    const sessionLogged = hasSession(currentStaffId, currentProgramId, c.CategoryID);
+    const conf        = state.confirmations.find(cf=>cf.StaffID===currentStaffId && cf.CategoryID===c.CategoryID && (!isAnnual || String(cf.RenewalYear)===String(THIS_YEAR)));
+    const modules     = (c.Modules||"").split("|").map(m=>m.trim()).filter(Boolean);
+
+    let actionHtml;
+    if (done) {
+      actionHtml = `<p style="color:#065f46;font-size:.78rem;font-weight:700">✓ Confirmed on ${fmtDate(conf?.ConfirmedAt)}${isAnnual?" for "+THIS_YEAR:""}</p>`;
+    } else if (!sessionLogged) {
+      actionHtml = `
+        <div style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:10px 12px;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:8px">
+          🔒 <span>Training has not been delivered yet. Your program manager must log a session for this category before you can confirm.</span>
+        </div>`;
+    } else {
+      actionHtml = `
+        <div class="attest-box">
+          <strong>Electronic Attestation</strong><br/><br/>
+          I attest that I have personally completed the training identified above in its entirety.
+          I understand that this acknowledgement is recorded electronically with my authenticated
+          user credentials and may be relied upon for compliance, audit, and employment-related
+          purposes. I acknowledge that providing false information may result in disciplinary action.
+        </div>
+        <button class="btn btn-gold" onclick="confirmCategory('${c.CategoryID}','${c.CategoryName}','${isAnnual}')">
+          Confirm Category Completion
+        </button>`;
+    }
 
     return `
       <div class="cat-card">
-        <div class="cat-card-header" style="background:${CAT_COLORS[i%CAT_COLORS.length]}">
+        <div class="cat-card-header" style="background:${CAT_COLORS[i%CAT_COLORS.length]};opacity:${!sessionLogged&&!done?0.7:1}">
           <span>${c.CategoryName}</span>
           <div style="display:flex;gap:6px;align-items:center">
             ${isAnnual?`<span class="badge badge-save">Annual ${THIS_YEAR}</span>`:""}
             ${done?`<span class="badge badge-done">Confirmed ✓</span>`:""}
+            ${!sessionLogged&&!done?`<span class="badge" style="background:#e5e7eb;color:#6b7280">Not Yet Delivered</span>`:""}
           </div>
         </div>
         <div class="cat-card-body">
-          ${isAnnual?`<div class="alert alert-save" style="margin-bottom:10px;font-size:.76rem">⚠️ This category includes <strong>S.A.V.E. Suicide Prevention Training</strong> which is required annually by the VA. Your confirmation will be recorded for <strong>${THIS_YEAR}</strong>.</div>`:""}
+          ${isAnnual&&sessionLogged?`<div class="alert alert-save" style="margin-bottom:10px;font-size:.76rem">⚠️ This category includes <strong>S.A.V.E. Suicide Prevention Training</strong> which is required annually by the VA. Your confirmation will be recorded for <strong>${THIS_YEAR}</strong>.</div>`:""}
           <div style="margin-bottom:12px">
             ${modules.map(m=>`
               <div class="module-item">
@@ -250,19 +282,7 @@ function renderCategories() {
                 <span style="color:${m.includes('S.A.V.E.')?'var(--save)':'#374151'};font-weight:${m.includes('S.A.V.E.')?700:400}">${m}</span>
               </div>`).join("")}
           </div>
-          ${done
-            ? `<p style="color:#065f46;font-size:.78rem;font-weight:700">✓ Confirmed on ${fmtDate(conf?.ConfirmedAt)}${isAnnual?" for "+THIS_YEAR:""}</p>`
-            : `<div class="attest-box">
-                <strong>Electronic Attestation</strong><br/><br/>
-                I attest that I have personally completed the training identified above in its entirety.
-                I understand that this acknowledgement is recorded electronically with my authenticated
-                user credentials and may be relied upon for compliance, audit, and employment-related
-                purposes. I acknowledge that providing false information may result in disciplinary action.
-               </div>
-               <button class="btn btn-gold" onclick="confirmCategory('${c.CategoryID}','${c.CategoryName}','${isAnnual}')">
-                 Confirm Category Completion
-               </button>`
-          }
+          ${actionHtml}
         </div>
       </div>`;
   }).join("");
