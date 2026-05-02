@@ -349,7 +349,11 @@ tr:last-child td{border-bottom:none}
       <div class="card-header">Settings</div>
       <div class="card-body">
         <button class="btn btn-outline btn-sm" onclick="logout()">🔒 Log Out / Switch PIN</button>
-        <p style="color:var(--muted);font-size:.75rem;margin-top:8px">Returns to the PIN entry screen.</p>
+        <p style="color:var(--muted);font-size:.75rem;margin-top:8px;margin-bottom:16px">Returns to the PIN entry screen.</p>
+        <label class="form-label">Update Apps Script URL</label>
+        <input type="url" id="newScriptUrl" class="form-control" placeholder="Paste new Apps Script URL here..." style="margin-bottom:8px"/>
+        <button class="btn btn-primary btn-sm" onclick="updateScriptUrl()">Save New URL</button>
+        <div id="updateUrlMsg" style="margin-top:8px"></div>
       </div>
     </div>
   </div>
@@ -416,6 +420,20 @@ function logout() {
   document.getElementById("pinInput").value = "";
   document.getElementById("mainApp").style.display = "none";
   document.getElementById("pinScreen").style.display = "flex";
+}
+
+function updateScriptUrl() {
+  const url = document.getElementById("newScriptUrl").value.trim();
+  const msg = document.getElementById("updateUrlMsg");
+  if (!url.startsWith("https://script.google.com")) {
+    msg.innerHTML = '<div class="alert alert-error">Please enter a valid Apps Script URL.</div>';
+    return;
+  }
+  localStorage.setItem(CONFIG_KEY, url);
+  SCRIPT_URL = url;
+  msg.innerHTML = '<div class="alert alert-success">URL updated! Reloading data...</div>';
+  document.getElementById("newScriptUrl").value = "";
+  setTimeout(() => { loadData(); }, 1200);
 }
 
 // ── API ───────────────────────────────────────────────────────

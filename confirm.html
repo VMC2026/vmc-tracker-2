@@ -120,6 +120,24 @@ body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color
       <button class="btn btn-outline" onclick="goBack()" style="margin-top:16px">← Back to Start</button>
     </div>
 
+    <!-- Update URL -->
+    <div style="text-align:center;margin-top:24px">
+      <button onclick="document.getElementById('updateUrlSection').style.display='block'" 
+        style="background:none;border:none;color:var(--muted);font-size:.72rem;cursor:pointer;text-decoration:underline">
+        Update Apps Script URL
+      </button>
+    </div>
+    <div id="updateUrlSection" style="display:none;margin-top:10px" class="card">
+      <div class="card-header">Update Connection URL</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label class="form-label">New Apps Script URL</label>
+          <input type="url" id="updateUrl" class="form-control" placeholder="https://script.google.com/macros/s/..."/>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="updateScriptUrl()">Save & Reconnect</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -152,6 +170,15 @@ function saveInlineUrl() {
   if (!url.startsWith("https://script.google.com")) { alert("Please enter a valid Apps Script URL."); return; }
   localStorage.setItem(CONFIG_KEY, url);
   SCRIPT_URL = url;
+  loadData();
+}
+
+function updateScriptUrl() {
+  const url = document.getElementById("updateUrl").value.trim();
+  if (!url.startsWith("https://script.google.com")) { alert("Please enter a valid Apps Script URL."); return; }
+  localStorage.setItem(CONFIG_KEY, url);
+  SCRIPT_URL = url;
+  document.getElementById("updateUrlSection").style.display = "none";
   loadData();
 }
 
