@@ -115,6 +115,13 @@ tr:last-child td{border-bottom:none}
     <div style="text-align:center;margin-top:16px;font-size:.72rem;color:var(--muted)">
       Contact your program administrator if you need your PIN.
     </div>
+    <div style="margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px" id="urlUpdateSection">
+      <div style="font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:8px">Need to update the connection URL?</div>
+      <input type="url" id="pinScreenUrl" class="pin-input" placeholder="Paste Apps Script URL here..."
+        style="font-size:.72rem;letter-spacing:0;margin-bottom:8px;text-align:left;padding:8px 12px"/>
+      <button class="btn btn-outline btn-block" style="font-size:.75rem" onclick="updateUrlFromPin()">Save New URL</button>
+      <div id="pinUrlMsg" style="margin-top:8px;font-size:.72rem;text-align:center;color:var(--emerald)"></div>
+    </div>
   </div>
 </div>
 
@@ -405,6 +412,21 @@ function logout() {
   document.getElementById("pinInput").value="";
   document.getElementById("mainApp").style.display="none";
   document.getElementById("pinScreen").style.display="flex";
+}
+
+function updateUrlFromPin() {
+  const url = document.getElementById("pinScreenUrl").value.trim();
+  const msg = document.getElementById("pinUrlMsg");
+  if (!url.startsWith("https://script.google.com")) {
+    msg.style.color = "var(--red)";
+    msg.textContent = "Please enter a valid Apps Script URL.";
+    return;
+  }
+  localStorage.setItem(CONFIG_KEY, url);
+  SCRIPT_URL = url;
+  msg.style.color = "var(--emerald)";
+  msg.textContent = "URL saved! Enter your PIN above.";
+  document.getElementById("pinScreenUrl").value = "";
 }
 
 function updateScriptUrl() {
