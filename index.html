@@ -424,25 +424,6 @@ async function submitPin() {
       document.getElementById("pinScreen").style.display="none";
       document.getElementById("mainApp").style.display="block";
       document.getElementById("roleBadge").textContent=userRole==="Admin"?"Admin":userRole==="Director"?"Director":userRole==="Executive"?"Executive":"Program Manager";
-    // Executive: show exec tab, hide manage and log
-    if (userRole === "Executive") {
-      const execBtn = document.getElementById("execNavBtn");
-      if (execBtn) execBtn.style.display = "";
-      // Hide everything except Executive View and History
-      document.querySelectorAll(".nav-btn").forEach(btn => {
-        const t = btn.textContent;
-        if (t.includes("Manage") || t.includes("Log Training") || t.includes("Dashboard")) {
-          btn.style.display = "none";
-        }
-      });
-      // Auto-navigate to executive view
-      document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
-      if (execBtn) execBtn.classList.add("active");
-      showTab("executive", execBtn);
-    } else {
-      const execBtn = document.getElementById("execNavBtn");
-      if (execBtn) execBtn.style.display = "none";
-    }
       loadData();
     } else {
       document.getElementById("pinError").textContent="Incorrect PIN. Please try again.";
@@ -521,15 +502,35 @@ function initUI() {
   if (userRole!=="Admin") document.getElementById("addProgramCard").style.display="none";
 
   onLogProgramChange();
-  renderDashboard();
-  renderManage();
 
-  document.getElementById("page-dashboard").classList.add("active");
   document.getElementById("headerMeta").innerHTML = `
     <div class="header-meta-item"><div class="val">${progs.length}</div><div class="lbl">Programs</div></div>
     <div class="header-meta-item"><div class="val">${state.staff.filter(s=>s.Active==="Yes").length}</div><div class="lbl">Staff</div></div>
     <div class="header-meta-item"><div class="val">${state.modules.length}</div><div class="lbl">Modules</div></div>
   `;
+
+  // Route to correct starting page based on role
+  if (userRole === "Executive") {
+    // Show only History and Executive View tabs
+    const execBtn = document.getElementById("execNavBtn");
+    if (execBtn) execBtn.style.display = "";
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      const t = btn.textContent;
+      if (t.includes("Manage") || t.includes("Log Training") || t.includes("Dashboard")) {
+        btn.style.display = "none";
+      }
+    });
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+    if (execBtn) execBtn.classList.add("active");
+    // Make sure all pages are hidden first then show exec
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById("page-executive").classList.add("active");
+    renderExecutive();
+  } else {
+    renderDashboard();
+    renderManage();
+    document.getElementById("page-dashboard").classList.add("active");
+  }
 }
 
 function showTab(name, btn) {
