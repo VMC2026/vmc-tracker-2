@@ -428,9 +428,12 @@ async function submitPin() {
     if (userRole === "Executive") {
       const execBtn = document.getElementById("execNavBtn");
       if (execBtn) execBtn.style.display = "";
+      // Hide everything except Executive View and History
       document.querySelectorAll(".nav-btn").forEach(btn => {
         const t = btn.textContent;
-        if (t.includes("Manage") || t.includes("Log Training")) btn.style.display = "none";
+        if (t.includes("Manage") || t.includes("Log Training") || t.includes("Dashboard")) {
+          btn.style.display = "none";
+        }
       });
       // Auto-navigate to executive view
       document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
@@ -895,29 +898,13 @@ function renderExecutive() {
       <div style="font-size:2rem;font-weight:700">${s.value}</div>
     </div>`).join("");
 
-  // Program grid
+  // Program grid -- site summary only, no individual staff names
   const rows = progs.map(prog => {
     const staff = allStaff.filter(s => s.ProgramID === prog.ProgramID);
     const cats  = state.categories.filter(c => c.ProgramTypeID === prog.ProgramTypeID);
     if (!staff.length || !cats.length) return "";
 
-    // Category breakdown
-    const catCols = cats.map(cat => {
-      const isAnnual = cat.AnnualRenewal === "Yes";
-      const confirmed = staff.filter(s =>
-        state.confirmations.some(c =>
-          c.StaffID === s.StaffID && c.CategoryID === cat.CategoryID &&
-          (!isAnnual || String(c.RenewalYear) === String(thisYear))
-        )
-      ).length;
-      const pctCat = Math.round((confirmed / staff.length) * 100);
-      const color  = pctCat === 100 ? "#10b981" : pctCat >= 50 ? "#f59e0b" : "#dc2626";
-      return `<td style="padding:10px 12px;text-align:center;border-right:1px solid #e5e7eb">
-        <div style="font-size:.72rem;font-weight:700;color:${color}">${pctCat}%</div>
-        <div style="font-size:.65rem;color:#6b7280">${confirmed}/${staff.length}</div>
-      </td>`;
-    }).join("");
-
+    // Overall completion for this program
     const overallConfirmed = staff.filter(s =>
       cats.every(c => {
         const isAnnual = c.AnnualRenewal === "Yes";
@@ -927,52 +914,45 @@ function renderExecutive() {
         );
       })
     ).length;
-    const overallPct = Math.round((overallConfirmed / staff.length) * 100);
+    const overallPct   = Math.round((overallConfirmed / staff.length) * 100);
     const overallColor = overallPct === 100 ? "#10b981" : overallPct >= 50 ? "#f59e0b" : "#dc2626";
 
+    // Progress bar
+    const bar = `<div style="background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden;margin-top:4px">
+      <div style="width:${overallPct}%;height:100%;border-radius:99px;background:${overallColor};transition:width .4s"></div>
+    </div>`;
+
+    // Sessions this quarter for this program
+    const qStart = new Date(new Date().getFullYear(), Math.floor(new Date().getMonth()/3)*3, 1);
+    const progSessions = (state.sessions||[]).filter(s => s.ProgramID === prog.ProgramID && new Date(s.SessionDate) >= qStart).length;
+
     return `<tr style="border-bottom:1px solid #e5e7eb">
-      <td style="padding:10px 14px;font-weight:700;font-size:.82rem;border-right:1px solid #e5e7eb;min-width:180px">${prog.ProgramName}</td>
-      <td style="padding:10px 12px;text-align:center;font-size:.82rem;border-right:1px solid #e5e7eb;color:#1a3a5c">${staff.length}</td>
-      ${catCols}
-      <td style="padding:10px 14px;text-align:center">
-        <div style="font-size:.9rem;font-weight:700;color:${overallColor}">${overallPct}%</div>
-        <div style="font-size:.65rem;color:#6b7280">${overallConfirmed} fully trained</div>
+      <td style="padding:12px 16px;font-weight:700;font-size:.85rem;border-right:1px solid #e5e7eb;min-width:200px">${prog.ProgramName}</td>
+      <td style="padding:12px 14px;text-align:center;border-right:1px solid #e5e7eb;font-size:.82rem;color:#1a3a5c;font-weight:700">${staff.length}</td>
+      <td style="padding:12px 14px;border-right:1px solid #e5e7eb;min-width:160px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-size:.9rem;font-weight:700;color:${overallColor}">${overallPct}%</span>
+          <span style="font-size:.7rem;color:#6b7280">${overallConfirmed} of ${staff.length} fully trained</span>
+        </div>
+        ${bar}
       </td>
+      <td style="padding:12px 14px;text-align:center;font-size:.82rem;color:#6b7280">${progSessions} this quarter</td>
     </tr>`;
   }).join("");
 
-  // Build header row with category names
-  const firstProg = progs[0];
-  const firstCats = firstProg ? state.categories.filter(c => {
-    const p = state.programs.find(pr => pr.ProgramID === firstProg.ProgramID);
-    return p && c.ProgramTypeID === p.ProgramTypeID;
-  }) : [];
 
-  // Use all unique categories across programs for header
-  const allCatIds = new Set();
-  const allCats = [];
-  progs.forEach(prog => {
-    state.categories.filter(c => c.ProgramTypeID === prog.ProgramTypeID).forEach(cat => {
-      if (!allCatIds.has(cat.CategoryID)) { allCatIds.add(cat.CategoryID); allCats.push(cat); }
-    });
-  });
-
-  const headerCols = allCats.map(c =>
-    `<th style="padding:10px 12px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;border-right:1px solid #e5e7eb;text-align:center;min-width:100px">${c.CategoryName}</th>`
-  ).join("");
-
-  document.getElementById("execProgramGrid").innerHTML = `
+    document.getElementById("execProgramGrid").innerHTML = `
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-family:inherit">
         <thead>
           <tr style="background:#f9fafb;border-bottom:2px solid #e5e7eb">
-            <th style="padding:10px 14px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;text-align:left;border-right:1px solid #e5e7eb">Program</th>
-            <th style="padding:10px 12px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;text-align:center;border-right:1px solid #e5e7eb">Staff</th>
-            ${headerCols}
-            <th style="padding:10px 14px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;text-align:center">Overall</th>
+            <th style="padding:10px 16px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;text-align:left;border-right:1px solid #e5e7eb">Program Site</th>
+            <th style="padding:10px 14px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;text-align:center;border-right:1px solid #e5e7eb">Staff</th>
+            <th style="padding:10px 14px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;text-align:left;border-right:1px solid #e5e7eb">Overall Completion</th>
+            <th style="padding:10px 14px;font-size:.68rem;font-weight:700;color:#1a3a5c;text-transform:uppercase;letter-spacing:.05em;text-align:center">Sessions (Qtr)</th>
           </tr>
         </thead>
-        <tbody>${rows || '<tr><td colspan="20" style="padding:20px;text-align:center;color:#6b7280">No program data available.</td></tr>'}</tbody>
+        <tbody>${rows || '<tr><td colspan="4" style="padding:20px;text-align:center;color:#6b7280">No program data available.</td></tr>'}</tbody>
       </table>
     </div>`;
 
