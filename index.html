@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>VMC Training Tracker</title>
+<title>VMC Staff Development System</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -105,13 +105,13 @@ tr:last-child td{border-bottom:none}
   <div class="pin-box">
     <div class="pin-logo">
       <div class="pin-logo-icon">⭐</div>
-      <div class="pin-title">VMC Training Tracker</div>
+      <div class="pin-title">VMC Staff Development System</div>
       <div class="pin-sub">Enter your access PIN to continue</div>
     </div>
     <input type="password" id="pinInput" class="pin-input" placeholder="••••••••"
       onkeydown="if(event.key==='Enter')submitPin()" maxlength="12"/>
     <div id="pinError" class="pin-error"></div>
-    <button class="btn btn-primary btn-block" onclick="submitPin()">Access Tracker</button>
+    <button class="btn btn-primary btn-block" onclick="submitPin()">Access Portal</button>
     <div style="text-align:center;margin-top:16px;font-size:.72rem;color:var(--muted)">
       Contact your program administrator if you need your PIN.
     </div>
@@ -152,7 +152,7 @@ tr:last-child td{border-bottom:none}
       <div class="header-icon">⭐</div>
       <div>
         <div class="header-tag">VMC · DOL/VETS · VA/HUD</div>
-        <div class="header-title">Staff Training Tracker <span id="roleBadge" class="role-badge"></span></div>
+        <div class="header-title">VMC Staff Development System <span id="roleBadge" class="role-badge"></span></div>
         <div class="header-sub">Veterans Multi-Service Center · Program Training Management</div>
       </div>
     </div>
@@ -398,7 +398,7 @@ async function submitPin() {
       currentPin=pin; userRole=data.role; userSites=data.sites;
       document.getElementById("pinScreen").style.display="none";
       document.getElementById("mainApp").style.display="block";
-      document.getElementById("roleBadge").textContent=userRole==="Admin"?"Admin":"Program Manager";
+      document.getElementById("roleBadge").textContent=userRole==="Admin"?"Admin":userRole==="Director"?"Director":"Program Manager";
       loadData();
     } else {
       document.getElementById("pinError").textContent="Incorrect PIN. Please try again.";
@@ -771,10 +771,11 @@ function renderRoster() {
   const staff=state.staff.filter(s=>s.Active==="Yes"&&(!fp||s.ProgramID===fp));
   document.getElementById("rosterList").innerHTML=!staff.length
     ? '<p style="color:var(--muted);font-size:.82rem">No staff found.</p>'
-    : `<table><thead><tr><th>Name</th><th>Role</th><th>Program</th><th>Added</th></tr></thead>
+    : `<table><thead><tr><th>Name</th><th>Role</th><th>Program</th><th>Added</th><th></th></tr></thead>
        <tbody>${staff.map(s=>`<tr>
          <td>${s.FullName}</td><td>${s.Role}</td>
          <td>${getProgramName(s.ProgramID)}</td><td>${fmtDate(s.AddedDate)}</td>
+         <td><button onclick="deactivateStaff('${s.StaffID}','${s.FullName}')" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:5px;padding:3px 8px;font-size:.72rem;cursor:pointer">Close Out</button></td>
        </tr>`).join("")}</tbody></table>`;
 }
 
@@ -795,6 +796,16 @@ async function addProgram() {
     document.getElementById("mgmtSite").value="";
     document.getElementById("mgmtOrg").value="";
   } else { msg.innerHTML=`<div class="alert alert-error">Error: ${res.error}</div>`; }
+}
+
+async function deactivateStaff(staffId, staffName) {
+  if (!confirm(`Close out ${staffName}?\n\nThis marks them Inactive. They will no longer appear in active rosters or session logs. Their complete training history is permanently retained.`)) return;
+  const res = await api("deactivateStaff", { staffId });
+  if (res.success) {
+    alert(res.message);
+    const d = await api("getBootstrap");
+    if (d.success) { state = d; initUI(); renderManage(); }
+  } else { alert("Error: " + res.error); }
 }
 
 async function addStaff() {

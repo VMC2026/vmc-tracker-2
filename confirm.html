@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>VMC Training Confirmation</title>
+<title>VMC Staff Development System</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -67,8 +67,8 @@ body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color
 
 <div class="header">
   <div class="header-icon">✅</div>
-  <div class="header-tag">VMC · Staff Portal</div>
-  <div class="header-title">Training Confirmation</div>
+  <div class="header-tag">VMC Staff Development System</div>
+  <div class="header-title">Staff Training Portal</div>
   <div class="header-sub">Veterans Multi-Service Center</div>
 </div>
 
@@ -77,25 +77,53 @@ body{font-family:'Georgia','Times New Roman',serif;background:var(--light);color
 
     <div id="loadingState" class="loading"><div class="spinner"></div><br/>Loading...</div>
 
-    <!-- Step 1 -->
+    <!-- Step 1: Staff PIN -->
     <div id="step1" style="display:none">
       <div class="confirm-hero">
         <div class="confirm-icon">👋</div>
         <div class="confirm-title">Welcome</div>
-        <div class="confirm-sub">Select your program and name to view your training progress and confirm completed categories.</div>
+        <div class="confirm-sub">Enter your 4-digit staff PIN to access your personal training record.</div>
       </div>
       <div class="card">
-        <div class="card-header">Who Are You?</div>
+        <div class="card-header">Staff Login</div>
         <div class="card-body">
           <div class="form-group">
-            <label class="form-label">Program</label>
-            <select id="confProgram" class="form-control" onchange="onProgramChange()"></select>
+            <label class="form-label">Your 4-Digit PIN</label>
+            <input type="password" id="staffPinInput" class="form-control"
+              maxlength="4" inputmode="numeric" pattern="[0-9]*"
+              placeholder="Enter your 4-digit PIN"
+              onkeydown="if(event.key==='Enter')submitStaffPin()"
+              style="letter-spacing:.25em;font-size:1.2rem;text-align:center"/>
           </div>
-          <div class="form-group">
-            <label class="form-label">Your Name</label>
-            <select id="confStaff" class="form-control"></select>
+          <div id="staffPinMsg" style="margin-bottom:10px"></div>
+          <button class="btn btn-primary" onclick="submitStaffPin()">Access My Training</button>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <p style="font-size:.72rem;color:var(--muted);margin-bottom:8px">First time? Set up your 4-digit PIN.</p>
+            <div class="form-group">
+              <label class="form-label">Program</label>
+              <select id="setupProgram" class="form-control" onchange="onSetupProgramChange()"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Name</label>
+              <select id="setupStaff" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Create Your 4-Digit PIN</label>
+              <input type="password" id="setupPin" class="form-control"
+                maxlength="4" inputmode="numeric" pattern="[0-9]*"
+                placeholder="Choose a 4-digit PIN"
+                style="letter-spacing:.25em;font-size:1.2rem;text-align:center"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm PIN</label>
+              <input type="password" id="setupPinConfirm" class="form-control"
+                maxlength="4" inputmode="numeric" pattern="[0-9]*"
+                placeholder="Re-enter your PIN"
+                style="letter-spacing:.25em;font-size:1.2rem;text-align:center"/>
+            </div>
+            <div id="setupMsg" style="margin-bottom:10px"></div>
+            <button class="btn btn-outline" onclick="setupStaffPin()">Create PIN & Login</button>
           </div>
-          <button class="btn btn-primary" onclick="loadCategories()">View My Training</button>
         </div>
       </div>
     </div>
@@ -192,32 +220,94 @@ async function loadData() {
   }
 }
 
+const STAFF_PIN_KEY = "vmc_staff_pins";
+
+function getStoredPins() {
+  try { return JSON.parse(localStorage.getItem(STAFF_PIN_KEY) || "{}"); } catch { return {}; }
+}
+
 function initUI() {
   const progs = state.programs.filter(p=>p.Active==="Yes");
-  document.getElementById("confProgram").innerHTML = progs.map(p=>`<option value="${p.ProgramID}">${p.ProgramName}</option>`).join("");
+  // Populate setup dropdowns
+  const setupProg = document.getElementById("setupProgram");
+  if (setupProg) {
+    setupProg.innerHTML = progs.map(p=>`<option value="${p.ProgramID}">${p.ProgramName}</option>`).join("");
+    onSetupProgramChange();
+  }
   document.getElementById("saveYear").textContent = THIS_YEAR;
-  onProgramChange();
   show("step1");
 }
 
-function onProgramChange() {
-  const pid   = document.getElementById("confProgram").value;
+function onSetupProgramChange() {
+  const pid   = document.getElementById("setupProgram").value;
   const staff = state.staff.filter(s=>s.ProgramID===pid&&s.Active==="Yes");
-  document.getElementById("confStaff").innerHTML = staff.map(s=>`<option value="${s.StaffID}">${s.FullName}</option>`).join("");
+  document.getElementById("setupStaff").innerHTML = staff.map(s=>`<option value="${s.StaffID}">${s.FullName}</option>`).join("");
 }
 
-function loadCategories() {
-  currentProgramId = document.getElementById("confProgram").value;
-  currentStaffId   = document.getElementById("confStaff").value;
-  const staffObj   = state.staff.find(s=>s.StaffID===currentStaffId);
-  if (!staffObj) return;
+function submitStaffPin() {
+  const pin = document.getElementById("staffPinInput").value.trim();
+  const msg = document.getElementById("staffPinMsg");
+  if (pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) {
+    msg.innerHTML = '<div class="alert alert-error">Please enter a 4-digit PIN.</div>'; return;
+  }
+  const pins = getStoredPins();
+  const staffId = Object.keys(pins).find(id => pins[id] === pin);
+  if (!staffId) {
+    msg.innerHTML = '<div class="alert alert-error">PIN not recognized. If this is your first time, use the setup form below.</div>'; return;
+  }
+  const staffObj = state.staff.find(s=>s.StaffID===staffId&&s.Active==="Yes");
+  if (!staffObj) {
+    msg.innerHTML = '<div class="alert alert-error">Staff account not found or inactive. Contact your program manager.</div>'; return;
+  }
+  currentStaffId   = staffId;
+  currentProgramId = staffObj.ProgramID;
   document.getElementById("staffLabel").textContent = staffObj.FullName + " · " + staffObj.Role;
-  const cats    = getCategories();
+  const cats = getCategories();
   const hasAnnual = cats.some(c=>c.AnnualRenewal==="Yes");
   document.getElementById("saveNotice").style.display = hasAnnual ? "block" : "none";
   renderCategories();
   show("step2");
 }
+
+function setupStaffPin() {
+  const staffId  = document.getElementById("setupStaff").value;
+  const pin      = document.getElementById("setupPin").value.trim();
+  const confirm2 = document.getElementById("setupPinConfirm").value.trim();
+  const msg      = document.getElementById("setupMsg");
+  if (pin.length !== 4 || !/^[0-9]{4}$/.test(pin)) {
+    msg.innerHTML = '<div class="alert alert-error">PIN must be exactly 4 digits.</div>'; return;
+  }
+  if (pin !== confirm2) {
+    msg.innerHTML = '<div class="alert alert-error">PINs do not match.</div>'; return;
+  }
+  const pins = getStoredPins();
+  // Check if PIN already in use by someone else
+  const existing = Object.keys(pins).find(id => pins[id] === pin && id !== staffId);
+  if (existing) {
+    msg.innerHTML = '<div class="alert alert-error">That PIN is already in use. Please choose a different one.</div>'; return;
+  }
+  pins[staffId] = pin;
+  localStorage.setItem(STAFF_PIN_KEY, JSON.stringify(pins));
+  msg.innerHTML = '<div class="alert alert-success">PIN created! Logging you in...</div>';
+  setTimeout(() => {
+    document.getElementById("staffPinInput").value = pin;
+    submitStaffPin();
+  }, 800);
+}
+
+function loadCategories() {
+  // Legacy path -- not used with PIN flow but kept for safety
+  const staffObj = state.staff.find(s=>s.StaffID===currentStaffId);
+  if (!staffObj) return;
+  document.getElementById("staffLabel").textContent = staffObj.FullName + " · " + staffObj.Role;
+  const cats = getCategories();
+  const hasAnnual = cats.some(c=>c.AnnualRenewal==="Yes");
+  document.getElementById("saveNotice").style.display = hasAnnual ? "block" : "none";
+  renderCategories();
+  show("step2");
+}
+
+function onProgramChange() {}
 
 function getCategories() {
   const prog = state.programs.find(p=>p.ProgramID===currentProgramId);
@@ -346,7 +436,12 @@ async function confirmCategory(categoryId, categoryName, annualRenewal) {
   } else { alert("Error saving: "+data.error); }
 }
 
-function goBack() { show("step1"); }
+function goBack() {
+  document.getElementById("staffPinInput").value = "";
+  document.getElementById("staffPinMsg").innerHTML = "";
+  currentStaffId = ""; currentProgramId = "";
+  show("step1");
+}
 
 function fmtDate(iso) {
   if(!iso) return "";
